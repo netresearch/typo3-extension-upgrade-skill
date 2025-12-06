@@ -429,6 +429,171 @@ Monitor [Changelog-14](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Change
 
 ---
 
+## PHP 8.4 Compatibility
+
+These changes are required for PHP 8.4 compatibility regardless of TYPO3 version.
+
+### Implicit Nullable Parameters (Critical)
+
+PHP 8.4 deprecates implicit nullable parameters. This affects all TYPO3 versions.
+
+**Search Pattern**
+```bash
+# Find parameters with null default but no explicit nullable type
+grep -rn '\(.*\$[a-zA-Z_]* = null\)' Classes/ | grep -v '?[a-zA-Z_\\]*\s*\$'
+```
+
+**Replace**
+```php
+// ❌ Deprecated in PHP 8.4 (E_DEPRECATED), Error in PHP 9.0
+public function foo(string $param = null): void
+public function bar(array $config = null): void
+
+// ✅ Required - Explicit nullable type
+public function foo(?string $param = null): void
+public function bar(?array $config = null): void
+```
+
+**Common Occurrences**
+- FlexForm configuration parameters
+- Optional service dependencies in constructors
+- Default TCA configuration arrays
+- Callback/hook method signatures
+
+**Rector Rule**: Use `NullableTypeDeclarationRector` to auto-fix.
+
+### TCA Items Array Format
+
+**Search Pattern**
+```bash
+grep -rn "'items'\s*=>\s*\[" Configuration/TCA/ | grep -v "label"
+```
+
+**Replace**
+```php
+// ❌ Old format (deprecated)
+'items' => [
+    ['Label', 'value'],
+    ['Other Label', 'other_value'],
+],
+
+// ✅ New format (TYPO3 v12+)
+'items' => [
+    ['label' => 'Label', 'value' => 'value'],
+    ['label' => 'Other Label', 'value' => 'other_value'],
+],
+```
+
+---
+
+## PSR-7 Request Handling Patterns
+
+### Query Parameter Access in Context Classes
+
+When migrating context matching or middleware that needs request data:
+
+**Search Pattern**
+```bash
+grep -rn "\$_GET\['\|\$_POST\['" Classes/
+```
+
+**Replace Pattern**
+```php
+// ❌ Old pattern - doesn't work with PSR-7 request flow
+$value = $_GET['param'] ?? null;
+
+// ✅ TYPO3 v12+ - Use PSR-7 request from container/middleware
+use Psr\Http\Message\ServerRequestInterface;
+
+class MyContext
+{
+    private ?ServerRequestInterface $request = null;
+
+    public function setRequest(ServerRequestInterface $request): self
+    {
+        $this->request = $request;
+        return $this;
+    }
+
+    public function match(): bool
+    {
+        // Get from stored request first, fallback to GLOBALS
+        $request = $this->request
+            ?? $GLOBALS['TYPO3_REQUEST']
+            ?? null;
+
+        if ($request === null) {
+            return false;
+        }
+
+        $value = $request->getQueryParams()['param'] ?? null;
+        return $value === 'expected';
+    }
+}
+```
+
+### Middleware Request Passing
+
+```php
+// In middleware, pass request to context/service
+public function process(
+    ServerRequestInterface $request,
+    RequestHandlerInterface $handler
+): ResponseInterface {
+    // Store request for context matching
+    Container::get()->setRequest($request)->initMatching();
+
+    return $handler->handle($request);
+}
+```
+
+---
+
+## SC_OPTIONS Hooks to PSR-14 Events
+
+### Page Visibility Hooks (Critical for v12+)
+
+SC_OPTIONS hooks for page visibility may not work correctly in TYPO3 v12+.
+
+**Search Pattern**
+```bash
+grep -rn "SC_OPTIONS\['t3lib/class.t3lib_page.php'\]" ext_localconf.php
+grep -rn "additionalQueryRestrictions" ext_localconf.php
+```
+
+**Issue**: Query restrictions registered in `additionalQueryRestrictions` may not be applied during page resolution in v12+.
+
+**Solution**: Migrate to PSR-14 events:
+
+```php
+// Configuration/Services.yaml
+services:
+  Vendor\Extension\EventListener\PageAccessListener:
+    tags:
+      - name: event.listener
+        identifier: 'vendor-extension/page-access'
+        event: TYPO3\CMS\Core\Domain\Event\BeforePageIsRetrievedEvent
+```
+
+```php
+// Classes/EventListener/PageAccessListener.php
+use TYPO3\CMS\Core\Domain\Event\BeforePageIsRetrievedEvent;
+
+final class PageAccessListener
+{
+    public function __invoke(BeforePageIsRetrievedEvent $event): void
+    {
+        // Check context and modify page access
+        $pageId = $event->getPageId();
+        // ... context matching logic
+    }
+}
+```
+
+**Note**: Test page visibility thoroughly after migration. Some hook-based restrictions require complete PSR-14 event migration to work correctly.
+
+---
+
 ## Dual Version Compatibility Matrix
 
 When supporting multiple versions (e.g., `^12.4 || ^13.4`):
@@ -472,6 +637,18 @@ grep -rn "PDO::PARAM_\|GeneralUtility::_GET\|itemFormElID" Classes/
 
 # v12→v13: TSFE direct access
 grep -rn "\$TSFE->fe_user\|\$TSFE->page\|\$TSFE->rootLine" Classes/
+
+# PHP 8.4: Implicit nullable parameters
+grep -rn '\$[a-zA-Z_]* = null)' Classes/ | grep -v '?'
+
+# PHP 8.4: Old TCA items format
+grep -rn "'items'\s*=>" Configuration/TCA/ | head -20
+
+# PSR-7: Direct superglobal access
+grep -rn "\$_GET\['\|\$_POST\['" Classes/
+
+# SC_OPTIONS hooks (may need PSR-14 migration)
+grep -rn "SC_OPTIONS" ext_localconf.php
 
 # All versions: Full deprecation scan
 grep -rn "@deprecated\|trigger_error.*E_USER_DEPRECATED" Classes/
