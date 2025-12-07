@@ -229,6 +229,8 @@ grep -rn "'wizards'\s*=>\|'wizard_'" Configuration/TCA/
 
 ### Doctrine DBAL 4.x (Critical)
 
+#### PDO Constants Removed
+
 **Search Pattern**
 ```bash
 grep -rn "PDO::PARAM_" Classes/
@@ -247,6 +249,52 @@ grep -rn "PDO::PARAM_" Classes/
 ```php
 use TYPO3\CMS\Core\Database\Connection;
 ```
+
+#### QueryBuilder execute() Removed
+
+**Search Pattern**
+```bash
+grep -rn "->execute()" Classes/
+```
+
+**Replace**
+
+| Before (DBAL 3.x) | After (DBAL 4.x) |
+|-------------------|------------------|
+| `$queryBuilder->execute()` (SELECT) | `$queryBuilder->executeQuery()` |
+| `$queryBuilder->execute()` (INSERT/UPDATE/DELETE) | `$queryBuilder->executeStatement()` |
+
+**Example Migration**
+```php
+// Before (DBAL 3.x)
+$result = $queryBuilder
+    ->select('*')
+    ->from('pages')
+    ->execute();
+
+// After (DBAL 4.x)
+$result = $queryBuilder
+    ->select('*')
+    ->from('pages')
+    ->executeQuery();
+```
+
+#### ParameterType Enum (PHPStan Warning)
+
+In Doctrine DBAL 4.x, type parameters changed from `int` to `ParameterType` enum:
+
+```php
+// This works but PHPStan may complain:
+->createNamedParameter($value, Connection::PARAM_INT)
+
+// PHPStan ignore pattern for dual v12/v13 compatibility:
+# Build/phpstan.neon
+parameters:
+    ignoreErrors:
+        - '~Parameter \\#2 \\$type of method .* expects .*, int given~'
+```
+
+**Note**: TYPO3 Core provides `Connection::PARAM_*` constants that work across versions, but PHPStan may still report type mismatches during the transition period
 
 ### GeneralUtility Deprecated Methods
 
