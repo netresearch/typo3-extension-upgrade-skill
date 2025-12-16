@@ -1,12 +1,12 @@
 {
   "name": "netresearch/agent-typo3-extension-upgrade",
-  "description": "Systematic TYPO3 extension upgrades to newer LTS versions with modern PHP compatibility. Covers Extension Scanner assessment, Rector for PHP migrations, Fractor for non-PHP file migrations, PHPStan fo",
+  "description": "Netresearch AI skill for TYPO3 extension upgrades to newer LTS versions",
   "type": "ai-agent-skill",
   "license": "MIT",
   "authors": [
     {
       "name": "Netresearch DTT GmbH",
-      "email": "plugins@netresearch.de",
+      "email": "info@netresearch.de",
       "homepage": "https://www.netresearch.de/",
       "role": "Manufacturer"
     }
