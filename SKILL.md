@@ -42,20 +42,13 @@ Systematic framework for upgrading TYPO3 extensions to newer LTS versions.
 Copy from `assets/` and adjust for target version:
 - `rector.php`, `fractor.php`, `phpstan.neon`, `phpunit.xml`, `.php-cs-fixer.php`
 
-## Version-Specific Guides
+## References
 
-- `references/upgrade-v11-to-v12.md` - TYPO3 v11→v12 specifics
-- `references/upgrade-v12-to-v13.md` - TYPO3 v12→v13 specifics
-- `references/dual-compatibility.md` - Supporting ^12.4 || ^13.4
-- `references/api-changes.md` - Detailed deprecation patterns
-- `references/real-world-patterns.md` - Fixes from actual upgrades
-
-## Success Criteria
-
-- `rector/fractor --dry-run` show no changes
-- `phpstan analyse` passes
-- All tests pass
-- Extension works in target TYPO3 version
+| Topic | File |
+|-------|------|
+| Pre-upgrade checklist | `references/pre-upgrade.md` |
+| API changes by version | `references/api-changes.md` |
+| Real-world patterns | `references/real-world-patterns.md` |
 
 ## TYPO3 Changelogs
 
@@ -64,6 +57,13 @@ Copy from `assets/` and adjust for target version:
 | v14 | [Changelog-14](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html) |
 | v13 | [Changelog-13](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-13.html) |
 | v12 | [Changelog-12](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-12.html) |
+
+## Success Criteria
+
+- `rector/fractor --dry-run` show no changes
+- `phpstan analyse` passes
+- All tests pass
+- Extension works in target TYPO3 version
 
 ---
 
