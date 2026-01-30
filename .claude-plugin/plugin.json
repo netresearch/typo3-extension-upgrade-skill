@@ -1,6 +1,6 @@
 {
   "name": "typo3-extension-upgrade",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Systematic TYPO3 extension upgrades with planning agents and commands",
   "repository": "https://github.com/netresearch/typo3-extension-upgrade-skill",
   "license": "MIT",
