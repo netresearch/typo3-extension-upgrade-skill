@@ -13,16 +13,14 @@ mechanical:
     desc: "rector.php should exist for automated code migration"
 
   - id: TU-02
-    type: contains
-    target: rector.php
-    pattern: "Typo3LevelSetList"
+    type: command
+    pattern: "grep -l 'Typo3LevelSetList' rector.php Build/rector.php 2>/dev/null | head -1"
     severity: warning
     desc: "Rector config should use TYPO3 level sets for version upgrades"
 
   - id: TU-03
-    type: contains
-    target: rector.php
-    pattern: "RectorConfig"
+    type: command
+    pattern: "grep -l 'RectorConfig' rector.php Build/rector.php 2>/dev/null | head -1"
     severity: warning
     desc: "Rector config should use modern RectorConfig format"
 
@@ -65,7 +63,7 @@ mechanical:
   - id: TU-09
     type: regex
     target: composer.json
-    pattern: '"typo3/cms-core":\\s*"\\^1[23]\\.[0-9]'
+    pattern: '"typo3/cms-core"\s*:\s*"[^"]*\^1[23]\.[0-9]' 
     severity: warning
     desc: "TYPO3 constraint should include v12 or v13"
 
