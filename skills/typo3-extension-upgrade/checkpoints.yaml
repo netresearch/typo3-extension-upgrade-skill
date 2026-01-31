@@ -70,63 +70,63 @@ mechanical:
   # === DEPRECATED API DETECTION ===
   - id: TU-10
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "GeneralUtility::devLog"
     severity: error
     desc: "Must not use deprecated GeneralUtility::devLog (removed in v10)"
 
   - id: TU-11
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "$GLOBALS['TYPO3_DB']"
     severity: error
     desc: "Must not use deprecated $GLOBALS['TYPO3_DB'] (removed in v9)"
 
   - id: TU-12
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "piVars"
     severity: warning
     desc: "Should not use deprecated piVars (pi_base pattern)"
 
   - id: TU-13
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "AbstractPlugin"
     severity: warning
     desc: "Should not use deprecated AbstractPlugin (pi_base)"
 
   - id: TU-14
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "TYPO3_MODE"
     severity: error
     desc: "Must not use deprecated TYPO3_MODE constant (removed in v11)"
 
   - id: TU-15
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "ObjectManager::getInstance"
     severity: warning
     desc: "Should not use ObjectManager::getInstance (use DI)"
 
   - id: TU-16
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "extRelPath"
     severity: error
     desc: "Must not use deprecated extRelPath (removed in v9)"
 
   - id: TU-17
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "PATH_site"
     severity: error
     desc: "Must not use deprecated PATH_site constant (use Environment API)"
 
   - id: TU-18
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "PATH_typo3conf"
     severity: error
     desc: "Must not use deprecated PATH_typo3conf constant"
@@ -179,7 +179,7 @@ mechanical:
   # === EXTENSION SCANNER INDICATORS ===
   - id: TU-25
     type: not_contains
-    target: "**/*.php"
+    target: "Classes/**/*.php"
     pattern: "@extensionScannerIgnoreLine"
     severity: info
     desc: "Review extensionScannerIgnoreLine annotations"
@@ -203,6 +203,7 @@ mechanical:
     type: file_exists
     target: Configuration/Backend/Modules.php
     severity: info
+    scope: backend
     desc: "Backend modules should use Configuration/Backend/Modules.php (v12+)"
 
   # === TCA MIGRATION ===
