@@ -56,14 +56,14 @@ mechanical:
   - id: TU-08
     type: regex
     target: composer.json
-    pattern: '"php":\\s*"\\^[89]\\.[0-9]'
+    pattern: '"php"\s*:\s*"[^"]*8\.[0-9]'
     severity: warning
     desc: "PHP constraint should include PHP 8.x versions"
 
   - id: TU-09
     type: regex
     target: composer.json
-    pattern: '"typo3/cms-core"\s*:\s*"[^"]*\^1[23]\.[0-9]' 
+    pattern: '"typo3/cms-core"\s*:\s*"[^"]*1[23]\.'
     severity: warning
     desc: "TYPO3 constraint should include v12 or v13"
 
