@@ -1,6 +1,6 @@
 ---
 name: typo3-extension-upgrade
-description: "Use when upgrading TYPO3 extensions to newer LTS versions (v11→v12, v12→v13, v13→v14), using Extension Scanner, Rector, Fractor, or fixing compatibility issues."
+description: "Use when upgrading TYPO3 extensions to newer LTS versions (v11→v12, v12→v13, v13→v14), using Extension Scanner, Rector, Fractor, PHPStan, testing, or fixing compatibility issues."
 ---
 
 # TYPO3 Extension Upgrade Skill
