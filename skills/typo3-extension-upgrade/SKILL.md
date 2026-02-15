@@ -1,6 +1,6 @@
 ---
 name: typo3-extension-upgrade
-description: "Agent Skill: Systematic TYPO3 extension upgrades to newer LTS versions. Covers Extension Scanner, Rector, Fractor, PHPStan, and testing. Use when upgrading extensions to newer TYPO3 versions or fixing compatibility issues. By Netresearch."
+description: "Use when upgrading TYPO3 extensions to newer LTS versions (v11→v12, v12→v13, v13→v14), using Extension Scanner, Rector, Fractor, or fixing compatibility issues."
 ---
 
 # TYPO3 Extension Upgrade Skill
