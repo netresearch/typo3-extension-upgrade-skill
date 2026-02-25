@@ -1,5 +1,8 @@
 {
-  "name": "netresearch/agent-typo3-extension-upgrade",
+  "name": "netresearch/typo3-extension-upgrade-skill",
+  "replace": {
+    "netresearch/agent-typo3-extension-upgrade": "self.version"
+  },
   "description": "Netresearch AI skill for TYPO3 extension upgrades to newer LTS versions",
   "type": "ai-agent-skill",
   "license": "MIT",
