@@ -221,6 +221,73 @@ mechanical:
     severity: warning
     desc: "Should migrate inputLink to TCA type=link (v12+)"
 
+  # === DEPRECATED REQUEST ACCESSORS ===
+  - id: TU-31
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "GeneralUtility::_GP("
+    severity: warning
+    desc: "Should not use deprecated GeneralUtility::_GP(); use PSR-7 request instead"
+
+  - id: TU-32
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "GeneralUtility::_GET("
+    severity: warning
+    desc: "Should not use deprecated GeneralUtility::_GET(); use PSR-7 request instead"
+
+  - id: TU-33
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "GeneralUtility::_POST("
+    severity: warning
+    desc: "Should not use deprecated GeneralUtility::_POST(); use PSR-7 request instead"
+
+  - id: TU-34
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "$GLOBALS['TSFE']"
+    severity: warning
+    desc: "Should not access TSFE via $GLOBALS; use PSR-7 request attributes or Context API"
+
+  # === DEPRECATED DI PATTERNS ===
+  - id: TU-35
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "@inject"
+    severity: warning
+    desc: "Should not use deprecated @inject annotation; use constructor injection"
+
+  # === DEPRECATED HOOK REGISTRATIONS ===
+  - id: TU-36
+    type: not_contains
+    target: ext_localconf.php
+    pattern: "SignalSlot"
+    severity: warning
+    desc: "Should not use deprecated Signal/Slot; migrate to PSR-14 events"
+
+  # === PHP-CS-FIXER CONFIGURATION ===
+  - id: TU-37
+    type: command
+    pattern: "ls Build/php-cs-fixer/php-cs-fixer.php .php-cs-fixer.php .php-cs-fixer.dist.php 2>/dev/null | head -1 || echo 'NOT_FOUND'"
+    severity: info
+    desc: "PHP-CS-Fixer configuration should exist for code style enforcement"
+
+  # === CHANGELOG ===
+  - id: TU-38
+    type: file_exists
+    target: CHANGELOG.md
+    severity: info
+    desc: "CHANGELOG.md should exist to document version changes"
+
+  # === DEPRECATED CONSTANTS ===
+  - id: TU-39
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "TYPO3_REQUESTTYPE"
+    severity: warning
+    desc: "Should not use deprecated TYPO3_REQUESTTYPE constant (use ApplicationType)"
+
 llm_reviews:
   # === COMPREHENSIVE RECTOR REVIEW ===
   - id: TU-40
