@@ -49,25 +49,40 @@ This skill is for **extension developers** upgrading extension code. It does NOT
 
 ## Installation
 
-### Option 1: Via Netresearch Marketplace (Recommended)
+### Marketplace (Recommended)
+
+Add the [Netresearch marketplace](https://github.com/netresearch/claude-code-marketplace) once, then browse and install skills:
 
 ```bash
+# Claude Code
 /plugin marketplace add netresearch/claude-code-marketplace
 ```
 
-Then browse skills with `/plugin`.
+### npx ([skills.sh](https://skills.sh))
 
-### Option 2: Download Release
-
-Download the [latest release](https://github.com/netresearch/typo3-extension-upgrade-skill/releases/latest) and extract to `~/.claude/skills/typo3-extension-upgrade/`
-
-### Option 3: Manual Installation
+Install with any [Agent Skills](https://agentskills.io)-compatible agent:
 
 ```bash
-# Copy to your user skills directory
-cp -r typo3-extension-upgrade-skill ~/.claude/skills/
+npx skills add https://github.com/netresearch/typo3-extension-upgrade-skill --skill typo3-extension-upgrade
 ```
 
+### Download Release
+
+Download the [latest release](https://github.com/netresearch/typo3-extension-upgrade-skill/releases/latest) and extract to your agent's skills directory.
+
+### Git Clone
+
+```bash
+git clone https://github.com/netresearch/typo3-extension-upgrade-skill.git
+```
+
+### Composer (PHP Projects)
+
+```bash
+composer require netresearch/typo3-extension-upgrade-skill
+```
+
+Requires [netresearch/composer-agent-skill-plugin](https://github.com/netresearch/composer-agent-skill-plugin).
 ## Usage
 
 The skill activates automatically when Claude detects:
