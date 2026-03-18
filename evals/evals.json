@@ -1,0 +1,34 @@
+[
+  {
+    "name": "upgrade-v12-to-v13",
+    "prompt": "Upgrade this extension from TYPO3 v12 to v13",
+    "assertions": [
+      {
+        "type": "tool_use",
+        "tool": "Read",
+        "description": "Reads composer.json and extension files"
+      },
+      {
+        "type": "content_contains",
+        "value": "rector",
+        "description": "Uses Rector for automated migration"
+      }
+    ]
+  },
+  {
+    "name": "extension-scanner",
+    "prompt": "Run Extension Scanner assessment",
+    "assertions": [
+      {
+        "type": "tool_use",
+        "tool": "Grep",
+        "description": "Searches for deprecated API usage"
+      },
+      {
+        "type": "content_contains",
+        "value": "deprecated",
+        "description": "Reports deprecated API findings"
+      }
+    ]
+  }
+]
