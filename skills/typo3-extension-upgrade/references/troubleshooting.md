@@ -64,10 +64,12 @@ If PHPStan reports many errors after Rector:
 When supporting multiple major versions of a dependency (e.g., `"vendor/package": "^3.0 || ^4.0"`):
 
 1. **PHPStan only sees ONE version at a time** — it analyzes against whatever is installed
-2. **Run PHPStan against EACH major version separately**:
+2. **Run PHPStan against EACH major version separately** (in a disposable worktree/CI job, or restore composer files after each run):
    ```bash
    composer require vendor/package:^3.0 --no-interaction && ./vendor/bin/phpstan analyse
+   git restore composer.json composer.lock
    composer require vendor/package:^4.0 --no-interaction && ./vendor/bin/phpstan analyse
+   git restore composer.json composer.lock
    ```
 3. **`@phpstan-ignore` is NOT a solution** for version-conditional code:
    - The tag suppresses the error but the code may still fail at runtime
@@ -104,10 +106,12 @@ When tests fail after widening a dependency's version constraint:
    Assert on output format, file extension, or other indicators rather than just
    asserting `save()` was called.
 
-4. **Run tests against each dependency version**:
+4. **Run tests against each dependency version** (in a disposable worktree/CI job, or restore composer files after each run):
    ```bash
    composer require vendor/package:^3.0 --no-interaction && ./vendor/bin/phpunit
+   git restore composer.json composer.lock
    composer require vendor/package:^4.0 --no-interaction && ./vendor/bin/phpunit
+   git restore composer.json composer.lock
    ```
 
 ## Extension Installs But Doesn't Work

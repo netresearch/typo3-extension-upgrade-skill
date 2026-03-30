@@ -13,17 +13,17 @@ When `composer.json` constraints widen to include a new major version of ANY dep
 
 ### Step 1: Enumerate All Usages
 
-Search the entire codebase for ALL usages of the dependency's API:
+Search your extension's PHP code (e.g., `Classes/`, `Tests/`, `Configuration/`, `Resources/`) for ALL usages of the dependency's API:
 
 ```bash
 # Find all imports/use statements for the package namespace
-grep -rn "use Vendor\\Package\\" Classes/ Tests/
+grep -rn "use Vendor\\Package\\" Classes/ Tests/ Configuration/ Resources/
 
 # Find all method calls on objects of that type
-grep -rn "->methodName(" Classes/
+grep -rn "->methodName(" Classes/ Tests/ Configuration/ Resources/
 
 # Find all static calls
-grep -rn "Vendor\\Package\\ClassName::" Classes/
+grep -rn "Vendor\\Package\\ClassName::" Classes/ Tests/ Configuration/ Resources/
 ```
 
 ### Step 2: Cross-Reference Against New Version's API
@@ -195,7 +195,8 @@ $mock->method('toWebp')->willReturn($encodedImage);
 // RIGHT: Mock only methods that exist on the interface in all versions
 // Or mock your own adapter interface instead
 $mock = $this->createMock(ImageProcessorInterface::class);
-$mock->method('convertToWebp')->willReturn(null);
+$mock->expects($this->once())
+    ->method('convertToWebp');
 ```
 
 ### Mock Callback Signatures Must Match

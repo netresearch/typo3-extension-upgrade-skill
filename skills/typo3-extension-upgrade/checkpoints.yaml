@@ -269,7 +269,7 @@ mechanical:
   # === THIRD-PARTY DEPENDENCY VERSION COMPATIBILITY ===
   - id: TU-60
     type: command
-    pattern: "php -r \"\\$c=json_decode(file_get_contents('composer.json'),true);foreach(\\$c['require']??[] as \\$p=>\\$v){if(preg_match('/\\|\\|/',\\$v)&&!str_starts_with(\\$p,'typo3/')&&!str_starts_with(\\$p,'php'))echo \\$p.': '.\\$v.PHP_EOL;}\" 2>/dev/null"
+    pattern: "php -r \"\\$c=json_decode(file_get_contents('composer.json'),true);foreach(\\$c['require']??[] as \\$p=>\\$v){if(preg_match('/\\|\\|/',\\$v)&&\\$p!=='php'&&!str_starts_with(\\$p,'typo3/')&&!str_starts_with(\\$p,'ext-')&&!str_starts_with(\\$p,'lib-'))echo \\$p.': '.\\$v.PHP_EOL;}\" 2>/dev/null"
     severity: info
     desc: "Identify non-TYPO3 dependencies with multi-major-version constraints (|| operator)"
 
