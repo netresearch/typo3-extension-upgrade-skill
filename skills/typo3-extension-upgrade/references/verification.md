@@ -11,6 +11,16 @@ An upgrade is complete when ALL of these are verified.
 - [ ] All unit tests pass
 - [ ] All functional tests pass (if any)
 
+### Multi-Version Dependency Verification
+
+If `composer.json` supports multiple major versions of any dependency:
+
+- [ ] `phpstan analyse` passes with **each** supported major version installed
+- [ ] `phpunit` passes with **each** supported major version installed
+- [ ] No `@phpstan-ignore` tags used for version-conditional code (use adapters)
+- [ ] All mock `->method()` calls reference methods on interfaces valid in ALL versions
+- [ ] CI matrix tests against each supported major version combination
+
 ## Real-World Testing (Required)
 
 **Do NOT skip this step.** Automated tools cannot catch all issues.

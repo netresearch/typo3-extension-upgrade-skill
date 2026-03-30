@@ -266,6 +266,27 @@ mechanical:
     severity: warning
     desc: "Should not use deprecated Signal/Slot; migrate to PSR-14 events"
 
+  # === THIRD-PARTY DEPENDENCY VERSION COMPATIBILITY ===
+  - id: TU-60
+    type: command
+    pattern: "php -r \"\\$c=json_decode(file_get_contents('composer.json'),true);foreach(\\$c['require']??[] as \\$p=>\\$v){if(preg_match('/\\|\\|/',\\$v)&&\\$p!=='php'&&!str_starts_with(\\$p,'typo3/')&&!str_starts_with(\\$p,'ext-')&&!str_starts_with(\\$p,'lib-'))echo \\$p.': '.\\$v.PHP_EOL;}\" 2>/dev/null"
+    severity: info
+    desc: "Identify non-TYPO3 dependencies with multi-major-version constraints (|| operator)"
+
+  - id: TU-61
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "@phpstan-ignore method.notFound"
+    severity: warning
+    desc: "Should not suppress method.notFound via @phpstan-ignore — use adapter pattern for version-conditional code"
+
+  - id: TU-62
+    type: not_contains
+    target: "Classes/**/*.php"
+    pattern: "@phpstan-ignore-next-line"
+    severity: info
+    desc: "Review @phpstan-ignore-next-line annotations — may mask version-specific runtime errors"
+
   # === PHP-CS-FIXER CONFIGURATION ===
   - id: TU-37
     type: command
@@ -470,3 +491,67 @@ llm_reviews:
       Create a prioritized action list for the upgrade process.
     severity: info
     desc: "Overall upgrade readiness and planning summary"
+
+  # === THIRD-PARTY DEPENDENCY API COMPATIBILITY ===
+  - id: TU-51
+    domain: dependency-compatibility
+    prompt: |
+      Analyze composer.json for third-party dependencies (non-TYPO3, non-PHP) that use
+      multi-version constraints (e.g., "^3.0 || ^4.0"):
+
+      1. For each such dependency, enumerate ALL usages of its API in Classes/ and Tests/
+      2. Cross-reference method calls against the dependency's interface definitions
+      3. Flag any method called on an interface-typed variable that only exists on the
+         concrete class or was removed/renamed in a newer major version
+      4. Check for @phpstan-ignore tags that mask version-conditional method calls —
+         these indicate a runtime error in one of the supported versions
+      5. Verify adapter pattern is used where method signatures differ between versions
+
+      Report each incompatibility with file:line reference and recommended fix.
+    severity: error
+    desc: "Third-party dependency API compatibility across all supported major versions"
+
+  # === PHPSTAN MULTI-VERSION VALIDATION ===
+  - id: TU-52
+    domain: static-analysis
+    prompt: |
+      Check PHPStan configuration and CI setup for multi-version dependency support:
+
+      1. If composer.json has any dependency with "||" constraints spanning major versions,
+         verify that PHPStan is configured to run against EACH major version
+      2. Check CI workflow (GitHub Actions / GitLab CI) for a test matrix that includes
+         each supported major version of multi-version dependencies
+      3. Look for @phpstan-ignore or @phpstan-ignore-next-line annotations in Classes/ —
+         each one should be reviewed to ensure it doesn't mask a real runtime error
+         in one of the supported versions
+      4. Check if method_exists() is used for version detection — if called on an instance
+         variable, PHPStan type narrowing can cause issues; recommend checking on the
+         class/interface name instead, or using the adapter pattern
+      5. Verify phpstan.neon does not pin a specific dependency version that would skip
+         validation of other supported versions
+
+      Report PHPStan gaps and recommend CI matrix additions.
+    severity: warning
+    desc: "PHPStan must validate against each supported major version of multi-version dependencies"
+
+  # === TEST MOCK COMPATIBILITY ===
+  - id: TU-53
+    domain: testing
+    prompt: |
+      Review test files for compatibility with multi-version dependencies:
+
+      1. Find all createMock() or getMockBuilder() calls that mock third-party interfaces
+      2. For each mock, verify that every ->method('name') call references a method
+         that exists on the interface in ALL supported major versions
+      3. Check willReturnCallback() closures — their parameter signatures must match
+         the mocked method's signature in each supported version
+      4. Look for test specificity loss: if production code was refactored from a
+         version-specific API (e.g., ->toWebp()->save()) to a version-agnostic API
+         (e.g., ->save()), verify that test assertions remain equally specific
+         (e.g., asserting output format, file extension, or quality parameters)
+      5. Check that test suites are configured to run against each supported dependency
+         version in CI
+
+      Report each incompatible mock with file:line and recommended fix.
+    severity: error
+    desc: "Test mocks must reference methods valid on interfaces in all supported dependency versions"
