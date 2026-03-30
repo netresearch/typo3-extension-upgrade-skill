@@ -25,6 +25,10 @@ Use this checklist before starting a TYPO3 extension upgrade.
 - [ ] Check for abandoned packages
 - [ ] Verify testing framework compatibility
 - [ ] Check Rector/PHPStan version requirements
+- [ ] **Identify third-party dependencies with major version changes** (see `third-party-dependency-upgrades.md`)
+- [ ] For each major-bumped dependency: enumerate all API usages in codebase
+- [ ] Cross-reference usages against new version's changelog/upgrade guide
+- [ ] Verify methods called on interfaces exist in ALL supported major versions
 
 ## Backup & Branch
 

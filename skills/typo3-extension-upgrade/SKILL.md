@@ -23,13 +23,14 @@ Systematic framework for upgrading TYPO3 extensions to newer LTS versions.
 1. Complete planning phase (consult `references/pre-upgrade.md`)
 2. Create feature branch (verify git is clean)
 3. Update `composer.json` constraints for target version
-4. Run `rector process --dry-run` then review and apply
-5. Run `fractor process --dry-run` then review and apply
-6. Run `php-cs-fixer fix`
-7. Run `phpstan analyse` and fix errors
-8. Run `phpunit` and fix tests
-9. Test in target TYPO3 version(s)
-10. Verify success criteria (consult `references/verification.md`)
+4. **Audit third-party dependencies** for major version changes (consult `references/third-party-dependency-upgrades.md`)
+5. Run `rector process --dry-run` then review and apply
+6. Run `fractor process --dry-run` then review and apply
+7. Run `php-cs-fixer fix`
+8. Run `phpstan analyse` **against each supported dependency version** and fix errors
+9. Run `phpunit` and fix tests
+10. Test in target TYPO3 version(s)
+11. Verify success criteria (consult `references/verification.md`)
 
 ## When NOT to Apply Automatically
 
@@ -40,6 +41,20 @@ Do NOT blindly apply Rector/Fractor if:
 - The rule affects complex APIs (DBAL, Extbase internals)
 
 Instead: apply specific rules manually, test between each change.
+
+## Third-Party Dependency Upgrades
+
+When `composer.json` widens constraints to include a new major version of ANY
+dependency (not just TYPO3 core), additional validation is required:
+
+1. **Enumerate** all usages of the dependency's API in the codebase
+2. **Cross-reference** each usage against the new version's API (removed/renamed methods)
+3. **Flag** methods called on interfaces that only exist on concrete classes
+4. **Verify** test mocks reference methods that exist on interfaces in ALL supported versions
+5. **Use adapter pattern** when method signatures differ between versions
+6. **Run PHPStan** against EACH supported major version, not just the latest
+
+See `references/third-party-dependency-upgrades.md` for detailed guidance and patterns.
 
 ## Quick Commands
 
@@ -83,6 +98,7 @@ Configure tooling by copying and adjusting these templates:
 | `references/real-world-patterns.md` | Looking for real-world migration examples |
 | `references/toolchain-output.md` | Understanding Rector/Fractor dry-run output |
 | `references/troubleshooting.md` | Rector broke code, PHPStan errors, test failures |
+| `references/third-party-dependency-upgrades.md` | Upgrading non-TYPO3 dependencies (major version bumps, adapter patterns) |
 | `references/verification.md` | Checking success criteria and real-world testing |
 
 ## External Resources
