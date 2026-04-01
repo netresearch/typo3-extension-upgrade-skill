@@ -58,15 +58,9 @@ fractor process --dry-run && fractor process       # Non-PHP migrations
 php-cs-fixer fix && phpstan analyse && phpunit     # Quality checks
 ```
 
-## TYPO3 Changelogs
-
-[v14](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html) |
-[v13](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-13.html) |
-[v12](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-12.html)
-
 ## Asset Templates
 
-Configure tooling from `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `phpunit.xml`, `.php-cs-fixer.php`
+Config templates in `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `phpunit.xml`, `.php-cs-fixer.php`
 
 ## References
 
@@ -76,6 +70,7 @@ Configure tooling from `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `
 | `references/api-changes.md` | Checking deprecated/removed APIs by TYPO3 version |
 | `references/upgrade-v11-to-v12.md` | Upgrading from TYPO3 v11 to v12 |
 | `references/upgrade-v12-to-v13.md` | Upgrading from TYPO3 v12 to v13 |
+| `references/upgrade-v13-to-v14.md` | Upgrading from TYPO3 v13 to v14 |
 | `references/dual-compatibility.md` | Maintaining dual compatibility (v12 + v13) |
 | `references/real-world-patterns.md` | Looking for real-world migration examples |
 | `references/toolchain-output.md` | Understanding Rector/Fractor dry-run output |
@@ -88,7 +83,3 @@ Configure tooling from `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `
 - [TYPO3 Rector](https://github.com/sabbelasichon/typo3-rector)
 - [Fractor](https://github.com/andreaswolf/fractor)
 - [TYPO3 Core Changelog](https://docs.typo3.org/c/typo3/cms-core/main/en-us/)
-
----
-
-> **Contributing:** https://github.com/netresearch/typo3-extension-upgrade-skill
