@@ -1,33 +1,429 @@
 [
   {
-    "name": "upgrade-v12-to-v13",
-    "prompt": "Upgrade this extension from TYPO3 v12 to v13",
+    "name": "upgrade-v11-to-v12",
+    "prompt": "I need to upgrade my TYPO3 extension from v11 to v12. The extension uses $GLOBALS['TYPO3_DB'], GeneralUtility::_GET(), and PDO::PARAM_INT. What steps should I follow and what specific code changes are needed?",
     "assertions": [
       {
-        "type": "tool_use",
-        "tool": "Read",
-        "description": "Reads composer.json and extension files"
+        "type": "content_contains",
+        "value": "rector",
+        "description": "Recommends Rector for automated migration"
+      },
+      {
+        "type": "content_contains",
+        "value": "Connection::PARAM_INT",
+        "description": "Provides correct replacement for PDO::PARAM_INT"
+      },
+      {
+        "type": "content_contains",
+        "value": "composer.json",
+        "description": "Mentions updating composer.json constraints"
+      }
+    ]
+  },
+  {
+    "name": "upgrade-v12-to-v13",
+    "prompt": "Upgrade this extension from TYPO3 v12 to v13. It uses $GLOBALS['TSFE']->fe_user and $TSFE->id throughout the codebase. What are the key breaking changes and migration steps?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "request",
+        "description": "Recommends PSR-7 request attributes"
+      },
+      {
+        "type": "content_contains",
+        "value": "frontend.user",
+        "description": "Shows correct v13 replacement for fe_user access"
       },
       {
         "type": "content_contains",
         "value": "rector",
-        "description": "Uses Rector for automated migration"
+        "description": "Mentions Rector with TYPO3 v13 level sets"
+      }
+    ]
+  },
+  {
+    "name": "upgrade-v13-to-v14",
+    "prompt": "I'm upgrading my extension from TYPO3 v13 to v14. It has userFunc references in TypoScript, uses Icon::SIZE_SMALL, and calls ExtensionConfiguration::getAll(). What needs to change?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "AsAllowedCallable",
+        "description": "Mentions required #[AsAllowedCallable] attribute for TypoScript callables"
+      },
+      {
+        "type": "content_contains",
+        "value": "IconSize",
+        "description": "Shows IconSize enum replacement for Icon::SIZE_* constants"
+      },
+      {
+        "type": "content_contains",
+        "value": "EXTENSIONS",
+        "description": "Shows $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS'] replacement for getAll()"
       }
     ]
   },
   {
     "name": "extension-scanner",
-    "prompt": "Run Extension Scanner assessment",
+    "prompt": "Run Extension Scanner assessment on my TYPO3 extension to find deprecated API usage. The extension has Classes/ with PHP files using GeneralUtility::makeInstance, $GLOBALS['TSFE'], and @inject annotations.",
     "assertions": [
-      {
-        "type": "tool_use",
-        "tool": "Grep",
-        "description": "Searches for deprecated API usage"
-      },
       {
         "type": "content_contains",
         "value": "deprecated",
         "description": "Reports deprecated API findings"
+      },
+      {
+        "type": "content_contains",
+        "value": "@inject",
+        "description": "Flags deprecated @inject annotation"
+      },
+      {
+        "type": "content_contains",
+        "value": "constructor injection",
+        "description": "Recommends constructor injection as replacement"
+      }
+    ]
+  },
+  {
+    "name": "rector-configuration",
+    "prompt": "How do I configure Rector for a TYPO3 v12 to v13 upgrade? Show me the rector.php configuration and explain which level sets to use.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Typo3LevelSetList",
+        "description": "Uses TYPO3 level set list"
+      },
+      {
+        "type": "content_contains",
+        "value": "UP_TO_TYPO3_13",
+        "description": "Specifies correct level set for v13 upgrade"
+      },
+      {
+        "type": "content_contains",
+        "value": "dry-run",
+        "description": "Recommends dry-run before applying"
+      }
+    ]
+  },
+  {
+    "name": "rector-dual-compat-warning",
+    "prompt": "I need to support both TYPO3 v12 and v13 simultaneously. Can I use Rector with UP_TO_TYPO3_13 level set?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "UP_TO_TYPO3_12",
+        "description": "Warns to use only UP_TO_TYPO3_12 for dual compatibility"
+      },
+      {
+        "type": "content_contains",
+        "value": "v13-only",
+        "description": "Explains v13-only APIs break v12 compatibility"
+      }
+    ]
+  },
+  {
+    "name": "fractor-typoscript-fluid",
+    "prompt": "My extension has TypoScript files with [end] conditions and Fluid templates using f:widget ViewHelpers. How do I migrate these for TYPO3 v12?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "fractor",
+        "description": "Recommends Fractor for non-PHP migrations"
+      },
+      {
+        "type": "content_contains",
+        "value": "f:widget",
+        "description": "Identifies f:widget as deprecated/removed in v12"
+      },
+      {
+        "type": "content_contains",
+        "value": "[global]",
+        "description": "Shows [end] to [global] migration or mentions Fractor handles it"
+      }
+    ]
+  },
+  {
+    "name": "phpstan-multi-version",
+    "prompt": "My extension supports intervention/image ^3.0 || ^4.0. PHPStan passes with v4 installed but I'm worried about v3 compatibility. How should I validate this?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "each",
+        "description": "Recommends running PHPStan against each major version"
+      },
+      {
+        "type": "content_contains",
+        "value": "adapter",
+        "description": "Suggests adapter pattern for version-incompatible APIs"
+      },
+      {
+        "type": "content_contains",
+        "value": "phpstan-ignore",
+        "description": "Warns against using @phpstan-ignore for version-conditional code"
+      }
+    ]
+  },
+  {
+    "name": "deprecated-api-tsfe",
+    "prompt": "My extension accesses $GLOBALS['TSFE']->fe_user->getKey('ses', 'mykey') throughout the code. What is the correct migration path for TYPO3 v13?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "request",
+        "description": "Directs to PSR-7 request-based approach"
+      },
+      {
+        "type": "content_contains",
+        "value": "getAttribute",
+        "description": "Shows request getAttribute pattern"
+      }
+    ]
+  },
+  {
+    "name": "deprecated-api-general-utility",
+    "prompt": "My extension has 50+ calls to GeneralUtility::_GET() and GeneralUtility::_POST(). What's the best migration strategy for TYPO3 v12?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "getQueryParams",
+        "description": "Shows PSR-7 getQueryParams as preferred replacement"
+      },
+      {
+        "type": "content_contains",
+        "value": "rector",
+        "description": "Suggests Rector for bulk migration"
+      }
+    ]
+  },
+  {
+    "name": "tca-migration",
+    "prompt": "My TCA configuration uses 'eval' => 'required,trim', renderType inputLink, and old items array format ['Label', 'value']. How do I migrate for TYPO3 v12?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "'required' => true",
+        "description": "Shows required field migration from eval to dedicated property"
+      },
+      {
+        "type": "content_contains",
+        "value": "type=link",
+        "description": "Shows inputLink to type=link migration"
+      },
+      {
+        "type": "content_contains",
+        "value": "'label'",
+        "description": "Shows new associative array format for items"
+      }
+    ]
+  },
+  {
+    "name": "testing-after-upgrade",
+    "prompt": "After running Rector for TYPO3 v12 upgrade, my PHPUnit tests fail. The testing framework version might be wrong and some test fixtures use deprecated APIs. How do I fix this?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "testing-framework",
+        "description": "Mentions typo3/testing-framework compatibility"
+      },
+      {
+        "type": "content_contains",
+        "value": "phpunit",
+        "description": "Addresses PHPUnit version requirements"
+      }
+    ]
+  },
+  {
+    "name": "dual-compatibility-v12-v13",
+    "prompt": "I need my extension to support both TYPO3 v12 and v13. What composer.json constraints should I use, and how do I handle APIs that differ between versions?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "^12.4 || ^13.4",
+        "description": "Shows correct dual version constraint"
+      },
+      {
+        "type": "content_contains",
+        "value": "PHP",
+        "description": "Mentions PHP version requirements (^8.2 minimum)"
+      }
+    ]
+  },
+  {
+    "name": "pre-upgrade-planning",
+    "prompt": "I'm about to start upgrading a large TYPO3 extension. What should I check and plan before making any code changes?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "git",
+        "description": "Mentions git status/branch preparation"
+      },
+      {
+        "type": "content_contains",
+        "value": "composer.json",
+        "description": "Mentions reviewing composer.json dependencies"
+      },
+      {
+        "type": "content_contains",
+        "value": "test",
+        "description": "Mentions checking current test status"
+      }
+    ]
+  },
+  {
+    "name": "verification-checklist",
+    "prompt": "I've completed my TYPO3 v12 to v13 upgrade. What verification steps should I perform before merging?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "rector",
+        "description": "Mentions rector dry-run should show no changes"
+      },
+      {
+        "type": "content_contains",
+        "value": "phpstan",
+        "description": "Mentions PHPStan must pass"
+      },
+      {
+        "type": "content_contains",
+        "value": "test",
+        "description": "Mentions running tests"
+      }
+    ]
+  },
+  {
+    "name": "third-party-dependency-upgrade",
+    "prompt": "My extension depends on intervention/image and I'm widening the constraint from ^3.0 to ^3.0 || ^4.0. The code calls $image->toWebp()->save(). How should I handle this?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "adapter",
+        "description": "Recommends adapter pattern for incompatible APIs"
+      },
+      {
+        "type": "content_contains",
+        "value": "interface",
+        "description": "Mentions checking interface vs concrete class methods"
+      },
+      {
+        "type": "content_contains",
+        "value": "toWebp",
+        "description": "Identifies toWebp() as version-specific API"
+      }
+    ]
+  },
+  {
+    "name": "signal-slot-to-psr14",
+    "prompt": "My extension registers hooks via $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'] and uses SignalSlotDispatcher. How do I migrate to PSR-14 events for TYPO3 v12?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "PSR-14",
+        "description": "Directs to PSR-14 event system"
+      },
+      {
+        "type": "content_contains",
+        "value": "Services.yaml",
+        "description": "Shows event listener registration via Services.yaml"
+      },
+      {
+        "type": "content_contains",
+        "value": "event.listener",
+        "description": "Shows correct service tag for event listeners"
+      }
+    ]
+  },
+  {
+    "name": "doctrine-dbal-migration",
+    "prompt": "My extension uses PDO::PARAM_INT, $queryBuilder->execute(), and Doctrine DBAL Type::getName(). What changes are needed for TYPO3 v12 and v14?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Connection::PARAM_INT",
+        "description": "Shows Connection constant replacement"
+      },
+      {
+        "type": "content_contains",
+        "value": "executeQuery",
+        "description": "Shows execute() to executeQuery()/executeStatement() migration"
+      }
+    ]
+  },
+  {
+    "name": "php84-compatibility",
+    "prompt": "My extension needs PHP 8.4 compatibility. It has function signatures like 'function foo(string $param = null)' and uses old TCA items format. What needs to change?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "?string",
+        "description": "Shows explicit nullable type syntax"
+      },
+      {
+        "type": "content_contains",
+        "value": "'label'",
+        "description": "Shows new TCA items associative array format"
+      }
+    ]
+  },
+  {
+    "name": "site-sets-v13",
+    "prompt": "TYPO3 v13 introduces Site Sets. My extension currently uses ext_typoscript_setup.typoscript for TypoScript inclusion. How do I migrate?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Configuration/Sets",
+        "description": "Shows Site Sets directory structure"
+      },
+      {
+        "type": "content_contains",
+        "value": "config.yaml",
+        "description": "Mentions config.yaml for set definition"
+      }
+    ]
+  },
+  {
+    "name": "backend-module-migration",
+    "prompt": "My extension registers backend modules in ext_tables.php using ExtensionManagementUtility::addModule. How should I migrate for TYPO3 v12+?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Configuration/Backend/Modules.php",
+        "description": "Shows modern module registration path"
+      }
+    ]
+  },
+  {
+    "name": "rector-broke-code",
+    "prompt": "I ran Rector for TYPO3 v12 upgrade and it broke my extension. The Extbase controller actions have wrong return types and DI patterns are broken. How do I recover and fix this?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "git",
+        "description": "Suggests git revert/checkout for recovery"
+      },
+      {
+        "type": "content_contains",
+        "value": "skip",
+        "description": "Shows how to skip problematic Rector rules"
+      },
+      {
+        "type": "content_contains",
+        "value": "dry-run",
+        "description": "Recommends dry-run approach going forward"
+      }
+    ]
+  },
+  {
+    "name": "ci-matrix-dual-version",
+    "prompt": "How should I set up GitHub Actions CI for an extension that supports TYPO3 v12 and v13 with PHP 8.2, 8.3, and 8.4?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "matrix",
+        "description": "Shows CI matrix configuration"
+      },
+      {
+        "type": "content_contains",
+        "value": "exclude",
+        "description": "Mentions excluding incompatible version combinations"
       }
     ]
   }
