@@ -50,6 +50,7 @@ Key skill commands (run in target extension, not this repo):
 - [SKILL.md](skills/typo3-extension-upgrade/SKILL.md) -- Main skill definition
 - [Pre-upgrade checklist](skills/typo3-extension-upgrade/references/pre-upgrade.md)
 - [API changes by version](skills/typo3-extension-upgrade/references/api-changes.md)
+- [v13 to v14 upgrade guide](skills/typo3-extension-upgrade/references/upgrade-v13-to-v14.md)
 - [Dual compatibility guide](skills/typo3-extension-upgrade/references/dual-compatibility.md)
 - [Verification criteria](skills/typo3-extension-upgrade/references/verification.md)
 - [Troubleshooting](skills/typo3-extension-upgrade/references/troubleshooting.md)

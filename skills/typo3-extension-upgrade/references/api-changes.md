@@ -343,6 +343,30 @@ grep -rn "'eval'.*'required'" Configuration/TCA/
 ],
 ```
 
+### TCA inputLink → type=link
+
+**Search Pattern**
+```bash
+grep -rn "'renderType' => 'inputLink'" Configuration/TCA/
+```
+
+**Replace**
+```php
+// Before (deprecated in v12)
+'config' => [
+    'type' => 'input',
+    'renderType' => 'inputLink',
+    'eval' => 'trim',
+],
+
+// After (v12+)
+'config' => [
+    'type' => 'link',
+],
+```
+
+**Note**: The `type=link` field automatically handles link browsing, no `renderType` needed.
+
 ### Form Element Data Structure
 
 **Search Pattern**
