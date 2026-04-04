@@ -387,6 +387,11 @@
         "type": "content_contains",
         "value": "Configuration/Backend/Modules.php",
         "description": "Shows modern module registration path"
+      },
+      {
+        "type": "content_contains",
+        "value": "ext_tables.php",
+        "description": "Identifies ext_tables.php registration as deprecated"
       }
     ]
   },
