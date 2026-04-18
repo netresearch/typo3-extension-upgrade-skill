@@ -39,16 +39,7 @@ affected. Instead: apply specific rules manually, test between each change.
 
 ## Third-Party Dependency Upgrades
 
-When `composer.json` widens constraints to a new major version of ANY dependency:
-
-1. **Enumerate** all usages of the dependency's API in the codebase
-2. **Cross-reference** against the new version's API (removed/renamed methods)
-3. **Flag** methods called on interfaces that only exist on concrete classes
-4. **Verify** test mocks reference methods existing in ALL supported versions
-5. **Use adapter pattern** when method signatures differ between versions
-6. **Run PHPStan** against EACH supported major version
-
-See `references/third-party-dependency-upgrades.md` for details.
+When `composer.json` widens constraints to a new major version: enumerate API usages, cross-reference the new version's API, flag interface/concrete-only methods, verify mocks against all supported versions, use adapter pattern for signature differences, run PHPStan against each major version. See `references/third-party-dependency-upgrades.md`.
 
 ## Quick Commands
 
