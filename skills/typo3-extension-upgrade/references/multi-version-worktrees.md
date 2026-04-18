@@ -26,43 +26,47 @@ Never switch branches in place when working on cross-version extension changes. 
 ### Setup
 
 ```bash
-cd ~/projects
-mkdir <ext-name> && cd <ext-name>
-git clone --bare <repo-url> .bare
-cd .bare
-git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-cd ..
+# Resolve an absolute project root once so every subsequent command is cwd-safe.
+EXT=<ext-name>
+PROJ="$HOME/projects/$EXT"
+BARE="$PROJ/.bare"
 
-# One worktree per version you support
-git -C .bare worktree add ../main main
-git -C .bare worktree add ../TYPO3_12 TYPO3_12
-git -C .bare worktree add ../TYPO3_13 TYPO3_13
+mkdir -p "$PROJ"
+git clone --bare <repo-url> "$BARE"
+git -C "$BARE" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
+# One worktree per supported version. Absolute paths for both -C and dest
+# (see 'Absolute Paths Only' below).
+git -C "$BARE" worktree add "$PROJ/main"     main
+git -C "$BARE" worktree add "$PROJ/TYPO3_11" TYPO3_11     # only if v11 is still supported
+git -C "$BARE" worktree add "$PROJ/TYPO3_12" TYPO3_12
+git -C "$BARE" worktree add "$PROJ/TYPO3_13" TYPO3_13
 ```
 
 ### Absolute Paths Only
 
-Creating a worktree with a relative path can silently produce the worktree INSIDE `.bare/` if the cwd is wrong. Always use an absolute path:
+Creating a worktree with a relative destination path can silently produce the worktree INSIDE `.bare/` if the cwd is wrong. Always use absolute paths — both for the `-C <bare>` argument and for the worktree destination:
 
 ```bash
-# WRONG — relative path, depends on cwd
+# WRONG — relative paths, depends on cwd
 git -C .bare worktree add ../feature-fix feature-fix
 
-# RIGHT — absolute path
-git -C /home/user/projects/ext-name/.bare worktree add /home/user/projects/ext-name/feature-fix feature-fix
+# RIGHT — absolute paths (use the $BARE / $PROJ variables from Setup)
+git -C "$BARE" worktree add "$PROJ/feature-fix" feature-fix
 ```
 
-If you find a worktree inside `.bare/`, remove it (`git worktree remove ...`) and recreate at the correct path. Never run `rm -rf` on a path under `.bare/` — you'll destroy the bare clone.
+If you find a worktree inside `.bare/`, prune it with `git -C "$BARE" worktree remove <path>` (or `git worktree remove --force <path>` from inside a sibling worktree) and recreate at the correct path. Never run `rm -rf` on a path under `.bare/` — you'll destroy the bare clone.
 
 ## Cache Safety
 
 Never edit the installed extension under `vendor/<vendor>/<ext-name>/` or `typo3conf/ext/<ext-name>/`. Those are deployed copies. Edit only in the source worktree. Composer sync / deploy will overwrite the installed copy on the next build.
 
-Pre-edit check:
+Pre-edit check. Patterns include both `…/segment/…` (cwd inside the segment) and `…/segment` (cwd *is* the segment), so a cwd sitting exactly at the directory boundary is caught too:
 
 ```bash
 pwd_real=$(realpath .)
 case "$pwd_real" in
-  */vendor/*|*/typo3conf/ext/*|*/\.bare/*)
+  */vendor/*|*/vendor|*/typo3conf/ext/*|*/typo3conf/ext|*/.bare/*|*/.bare)
     echo "REFUSING to edit installed/cache path: $pwd_real"
     exit 1
     ;;
@@ -94,12 +98,12 @@ git cherry-pick <sha>
 Build/Scripts/runTests.sh -s unit -p 8.1
 Build/Scripts/runTests.sh -s functional -p 8.1
 
-# 6. Commit with a trailer identifying the origin
+# 6. Amend the cherry-pick commit to document the origin. -s adds a
+#    Signed-off-by trailer automatically (don't add one by hand — that
+#    duplicates it); -S re-signs the amended commit.
 git commit --amend -s -S -m "fix: <bug>
 
-Backport of <sha> from main.
-
-Signed-off-by: ..."
+Backport of <sha> from main."
 
 # 7. Push backport branch
 git push -u origin backport/TYPO3_12-<bug>
