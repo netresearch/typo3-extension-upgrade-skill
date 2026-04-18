@@ -77,6 +77,7 @@ Config templates in `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `php
 | `references/troubleshooting.md` | Rector broke code, PHPStan errors, test failures |
 | `references/third-party-dependency-upgrades.md` | Upgrading non-TYPO3 dependencies (major version bumps, adapter patterns) |
 | `references/verification.md` | Checking success criteria and real-world testing |
+| `references/multi-version-worktrees.md` | Per-LTS worktree layout, backport workflow, cross-version CI matrix |
 
 ## External Resources
 
