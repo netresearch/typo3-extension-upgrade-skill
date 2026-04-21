@@ -1,6 +1,6 @@
 # TYPO3 v13 → v14 Upgrade Guide
 
-**Context:** TYPO3 v14.3 LTS released 2026-04-21. v14 introduces the largest breaking-change sweep in several cycles: 98 breaking + 31 deprecation + 105 feature + 16 important entries, **all landed in v14.0**. v14.1/14.2/14.3 added zero breaking changes — the LTS stability promise.
+**Context:** TYPO3 v14.3 LTS released 2026-04-21. v14 introduces the largest breaking-change sweep in several cycles: 98 breaking + 31 deprecations + 105 features + 16 important entries, **all landed in v14.0**. v14.1/14.2/14.3 added zero breaking changes — the LTS stability promise.
 
 **Free support window:** bugfix until 2027-12-31, security until 2029-06-30.
 
@@ -37,10 +37,14 @@
 
 ### Dual v13 + v14
 
-See companion file `dual-compatibility.md` and also the typo3-conformance-skill's `references/v13-v14-dual-compatibility.md` for the full matrix. Short form:
+See companion file `dual-compatibility.md` and also the typo3-conformance-skill's `references/v13-v14-dual-compatibility.md` for the full matrix. Short form (inside the `require` block of `composer.json`):
 
 ```json
-"typo3/cms-core": "^13.4 || ^14.3"
+{
+    "require": {
+        "typo3/cms-core": "^13.4 || ^14.3"
+    }
+}
 ```
 
 ---
@@ -171,6 +175,8 @@ All 98 breakers landed in v14.0. **If your extension compiles against v14.0, it'
 If supporting v13 + v14:
 
 ```php
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 // HashService shim
 if (class_exists(\TYPO3\CMS\Core\Crypto\HashService::class)) {
     $hash = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Crypto\HashService::class);
@@ -178,16 +184,21 @@ if (class_exists(\TYPO3\CMS\Core\Crypto\HashService::class)) {
     $hash = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Security\Cryptography\HashService::class);
 }
 
-// Icon sizes
-$icon = $iconFactory->getIcon('name', \TYPO3\CMS\Core\Imaging\IconSize::SMALL ?? 'small');
-
-// New attributes (v14-only) — v13 safely ignores unknown attributes
-#[Authorize(requireLogin: true)]
-#[RateLimit(limit: 5, interval: '1m')]
-public function sensitiveAction(): ResponseInterface { /* ... */ }
+// Icon sizes — IconSize::SMALL fatals on v13 if referenced unguarded.
+// Use class_exists() on the enum, not the `?? fallback` pattern.
+$iconSize = class_exists(\TYPO3\CMS\Core\Imaging\IconSize::class)
+    ? \TYPO3\CMS\Core\Imaging\IconSize::SMALL
+    : 'small';
+$icon = $iconFactory->getIcon('name', $iconSize);
 ```
 
-See `dual-compatibility.md` for the full v12+v13 matrix; the typo3-conformance-skill repo ships `references/v13-v14-dual-compatibility.md` with the v13+v14 variant.
+**PHP attributes on v13+v14 dual code** — do NOT guard `use` / `#[…]` at runtime (attributes are declarative; `class_exists()` on a use statement is a no-op). Options:
+
+- Don't add the v14-only attribute on dual-version code paths; accept missing progressive enhancement on v13.
+- Ship polyfill stub classes for v13 that declare `Authorize` / `RateLimit` as no-op `#[\Attribute]` — see `typo3-conformance-skill` `references/v13-v14-dual-compatibility.md` for the full pattern.
+- Branch the controller: two concrete classes, one with attributes, selected via service factory based on `(new Typo3Version())->getMajorVersion()`.
+
+See `dual-compatibility.md` for the full v12+v13 matrix; the typo3-conformance-skill repo ships `references/v13-v14-dual-compatibility.md` with the v13+v14 variant and the polyfill-stub example.
 
 ---
 
