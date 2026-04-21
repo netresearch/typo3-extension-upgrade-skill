@@ -20,7 +20,7 @@
 ```
 
 - **PHP floor:** `8.2` (unchanged from v12/v13). Ceiling: `8.5.99`.
-- Composer ≥ 2.1 required by core.
+- Composer ≥ 2.1 required by core ([get.typo3.org/version/14](https://get.typo3.org/version/14)).
 
 ### ext_emconf.php (v14-only)
 
@@ -61,7 +61,7 @@ $rectorConfig->sets([
 - `--only=<RuleClass>` — run a single rule (47 v14 rules available)
 - `--no-progress-bar` — cleaner CI output
 
-**47 v14-specific Rector rules** ship in `rules/TYPO314/v0/` (46) and `rules/TYPO314/v2/` (1). Highlights:
+**47 v14-specific Rector rules** ship in `rules/TYPO314/v0/` (46) and `rules/TYPO314/v2/` (1). Highlights (full list in [`ssch/typo3-rector`](https://github.com/sabbelasichon/typo3-rector/tree/main/rules/TYPO314)):
 
 - `RequireComposerJsonInClassicModeRector` (#108310)
 - `UseStrictTypesInFluidViewHelpersRector` (#108148)
@@ -201,7 +201,7 @@ See `dual-compatibility.md` for the full v12+v13 matrix; the typo3-conformance-s
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
-        "phpunit/phpunit": "^11.2 || ^12.1 || ^13.0",
+        "phpunit/phpunit": "^11.2.5 || ^12.1.2 || ^13.0.2",
         "rector/rector": "^2.0",
         "ssch/typo3-rector": "^3.0",
         "typo3/testing-framework": "^9.5"
