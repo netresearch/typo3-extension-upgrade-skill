@@ -6,35 +6,37 @@ skill_id: typo3-extension-upgrade
 
 mechanical:
   # === RECTOR CONFIGURATION ===
+  # Accept both root and Build/ subdirectory layouts (common in extensions that
+  # keep testing/CI tooling under Build/). Build/rector/rector.php is the
+  # Netresearch default when using a split Build/ structure.
   - id: TU-01
     type: file_exists
-    target: rector.php
+    target: "{rector.php,Build/rector.php,Build/rector/rector.php}"
     severity: warning
-    desc: "rector.php should exist for automated code migration"
+    desc: "rector.php should exist for automated code migration (root or Build/ subdir)"
 
   - id: TU-02
     type: command
-    pattern: "grep -l 'Typo3LevelSetList' rector.php Build/rector.php 2>/dev/null | head -1"
+    pattern: "grep -l 'Typo3LevelSetList' rector.php Build/rector.php Build/rector/rector.php 2>/dev/null | head -1"
     severity: warning
     desc: "Rector config should use TYPO3 level sets for version upgrades"
 
   - id: TU-03
     type: command
-    pattern: "grep -l 'RectorConfig' rector.php Build/rector.php 2>/dev/null | head -1"
+    pattern: "grep -l 'RectorConfig' rector.php Build/rector.php Build/rector/rector.php 2>/dev/null | head -1"
     severity: warning
     desc: "Rector config should use modern RectorConfig format"
 
   # === FRACTOR CONFIGURATION (TypoScript/Fluid) ===
   - id: TU-04
     type: file_exists
-    target: fractor.php
+    target: "{fractor.php,Build/fractor.php,Build/fractor/fractor.php}"
     severity: info
-    desc: "fractor.php should exist for TypoScript/Fluid migration"
+    desc: "fractor.php should exist for TypoScript/Fluid migration (root or Build/ subdir)"
 
   - id: TU-05
-    type: contains
-    target: fractor.php
-    pattern: "Typo3LevelSetList"
+    type: command
+    pattern: "grep -l 'Typo3LevelSetList' fractor.php Build/fractor.php Build/fractor/fractor.php 2>/dev/null | head -1"
     severity: info
     desc: "Fractor config should use TYPO3 level sets"
 
