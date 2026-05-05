@@ -727,6 +727,84 @@ if (class_exists(IconSize::class)) {
 $icon = $iconFactory->getIcon('actions-edit', 'small');
 ```
 
+### GeneralUtility::getIndpEnv() Deprecated -- Use NormalizedParams (v14.3)
+
+> **Deprecated: v14.3, scheduled for removal in v15.0**
+> **Source**: `typo3/cms-core` v14.3.0 vendor source, `Classes/Utility/GeneralUtility.php` (the `@deprecated` tag is on the method itself).
+> **Verify locally**: `grep -n -B5 "function getIndpEnv(" vendor/typo3/cms-core/Classes/Utility/GeneralUtility.php` -- shows the docblock with `@deprecated since TYPO3 v14.3, will be removed in TYPO3 v15.0` directly above the method signature (line ~2142 in v14.3.0).
+
+`GeneralUtility::getIndpEnv($name)` is deprecated since **TYPO3 v14.3** and scheduled for removal in **v15.0**. Replacement is `NormalizedParams` from the PSR-7 request.
+
+> ⚠️ Don't trust AI assistants on this deprecation timing. Gemini Code Assist has been observed claiming `getIndpEnv()` was deprecated in v13.0 / removed in v14.0, and that `NormalizedParams::createFromServerParams()` was removed in v14.0 in favour of a (non-existent) `NormalizedParamsFactory` class. All three claims are wrong -- verified false against `typo3/cms-core` v14.3.0 vendor source. Always verify deprecation timing by reading the `@deprecated` annotation in `vendor/typo3/cms-core/`.
+
+**Search Pattern**
+```bash
+grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Configuration/
+```
+
+**Method mapping** (`getIndpEnv($name)` → `NormalizedParams` method)
+
+| `getIndpEnv()` argument | `NormalizedParams` method |
+|---|---|
+| `'REMOTE_ADDR'` | `getRemoteAddress()` |
+| `'HTTP_HOST'` | `getHttpHost()` |
+| `'TYPO3_SSL'` | `isHttps()` |
+| `'HTTP_REFERER'` | `getHttpReferer()` |
+| `'REQUEST_URI'` | `getRequestUri()` |
+| `'SCRIPT_NAME'` | `getScriptName()` |
+| `'TYPO3_REQUEST_HOST'` | `getRequestHost()` |
+| `'TYPO3_REQUEST_URL'` | `getRequestUrl()` |
+| `'TYPO3_SITE_URL'` | `getSiteUrl()` |
+| `'TYPO3_SITE_PATH'` | `getSitePath()` |
+
+**Replace -- in controllers/middleware (request injected)**
+```php
+// ❌ Before
+$ip = GeneralUtility::getIndpEnv('REMOTE_ADDR');
+
+// ✅ After (PSR-7 request available)
+$ip = $request->getAttribute('normalizedParams')?->getRemoteAddress() ?? '';
+```
+
+**Replace -- in services/auth services (no request injected)**
+
+For services where `ServerRequestInterface` cannot be injected (e.g. `AbstractAuthenticationService` subclasses, CLI commands), fall back through `$GLOBALS['TYPO3_REQUEST']` and finally re-create `NormalizedParams` from `$_SERVER`:
+
+```php
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Http\NormalizedParams;
+
+private function getRemoteAddress(): string
+{
+    // 1. Prefer PSR-7 request (set in middleware-driven flows)
+    $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
+    if ($request instanceof ServerRequestInterface) {
+        $params = $request->getAttribute('normalizedParams');
+        if ($params instanceof NormalizedParams) {
+            return $params->getRemoteAddress();
+        }
+    }
+
+    // 2. CLI / test fallback -- createFromServerParams() exists and is callable
+    //    in v14.3 (verified at NormalizedParams.php:306, marked only @internal,
+    //    NOT @deprecated).
+    $confVars = $GLOBALS['TYPO3_CONF_VARS'] ?? null;
+    $sysConf = is_array($confVars) && isset($confVars['SYS']) && is_array($confVars['SYS'])
+        ? $confVars['SYS']
+        : [];
+
+    return NormalizedParams::createFromServerParams($_SERVER, $sysConf)->getRemoteAddress();
+}
+```
+
+**Dual-version compatibility (v12.4 + v13.4 + v14.3)**
+
+The migration is safe across the entire supported range with **no compatibility shims**: `NormalizedParams` has been part of TYPO3 since v9.4, and `normalizedParams` has been a request attribute since v10. Just migrate to `NormalizedParams` in one step -- it works on v12.4 / v13.4 / v14.3 unchanged, and silences the v14.3 deprecation.
+
+**Reference migration**: [netresearch/t3x-nr-passkeys-be commit b2cfd8e](https://github.com/netresearch/t3x-nr-passkeys-be/commit/b2cfd8e) (v14.3 upgrade [#57](https://github.com/netresearch/t3x-nr-passkeys-be/pull/57)).
+
+**No Rector rule yet** (as of v14.3 / typo3-rector 3.x). Manual `grep` + replace required.
+
 ### Additional v14 Changes
 
 Monitor [Changelog-14](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html) for additional breaking changes.
@@ -735,6 +813,9 @@ Monitor [Changelog-14](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Change
 - `ExtensionConfiguration::getAll()` - use `$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']`
 - `Type::getName()` in Doctrine DBAL - use `instanceof` checks
 - `Icon::SIZE_*` constants - use `IconSize` enum
+
+**Known Deprecations (v14.3, removal in v15.0)**
+- `GeneralUtility::getIndpEnv()` - use `NormalizedParams` from PSR-7 request
 
 ---
 
@@ -917,6 +998,8 @@ When supporting multiple versions (e.g., `^12.4 || ^13.4`):
 | `$_GET['param'] ?? null` | ✅ | ✅ | ✅ | ✅ |
 | `$TSFE->fe_user` | ✅ | ✅ | ⚠️ | ❌ |
 | `$request->getAttribute('frontend.user')` | ❌ | ❌ | ✅ | ✅ |
+| `GeneralUtility::getIndpEnv()` | ✅ | ✅ | ✅ | ⚠️ (v14.3) |
+| `$request->getAttribute('normalizedParams')` | ✅ | ✅ | ✅ | ✅ |
 | Signal/Slot | ⚠️ | ❌ | ❌ | ❌ |
 | PSR-14 Events | ✅ | ✅ | ✅ | ✅ |
 
@@ -946,6 +1029,9 @@ grep -rn "PDO::PARAM_\|GeneralUtility::_GET\|itemFormElID" Classes/
 
 # v12→v13: TSFE direct access
 grep -rn "\$TSFE->fe_user\|\$TSFE->page\|\$TSFE->rootLine" Classes/
+
+# v13→v14.3: getIndpEnv() deprecation (use NormalizedParams)
+grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Configuration/
 
 # PHP 8.4: Implicit nullable parameters
 grep -rn '\$[a-zA-Z_]* = null)' Classes/ | grep -v '?'

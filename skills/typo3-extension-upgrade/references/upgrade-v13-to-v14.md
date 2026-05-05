@@ -124,6 +124,18 @@ All 98 breakers landed in v14.0. **If your extension compiles against v14.0, it'
 | Frontend HTTP compression removed | #107943 | check TypoScript `config.compressionLevel` | Delegate to web server (nginx/Apache) |
 | Extbase `ActionController->view` typed | #105377 | — | Type-check any custom controller overrides |
 
+### v14.x deprecations (still callable, removed in v15.0)
+
+These are **not** v14.0 breakers — code keeps working — but you should migrate to silence deprecation notices and prepare for v15.
+
+| Change | Forge / Source | Search | Fix |
+|---|---|---|---|
+| `GeneralUtility::getIndpEnv()` deprecated (v14.3) | `cms-core` v14.3 — `Classes/Utility/GeneralUtility.php` `@deprecated` annotation | `grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Configuration/` | `$request->getAttribute('normalizedParams')->getRemoteAddress()` etc. — see `api-changes.md` |
+
+> ⚠️ **AI-assistant warning**: Don't trust Gemini Code Assist on `getIndpEnv()` deprecation timing. It has hallucinated v13.0 deprecation / v14.0 removal, and falsely claimed `NormalizedParams::createFromServerParams()` was removed in v14.0 in favour of a non-existent `NormalizedParamsFactory`. All three claims are wrong — verified false against `typo3/cms-core` v14.3.0 vendor source. Always grep the `@deprecated` annotation in `vendor/typo3/cms-core/` to confirm.
+
+The migration is safe across **v12.4 + v13.4 + v14.3** without compatibility shims — `NormalizedParams` is in core since v9.4, `normalizedParams` request attribute since v10. Reference migration: [netresearch/t3x-nr-passkeys-be commit b2cfd8e](https://github.com/netresearch/t3x-nr-passkeys-be/commit/b2cfd8e) (v14.3 upgrade [PR #57](https://github.com/netresearch/t3x-nr-passkeys-be/pull/57)).
+
 ### FAL / File handling
 
 | Change | Forge | Fix |
