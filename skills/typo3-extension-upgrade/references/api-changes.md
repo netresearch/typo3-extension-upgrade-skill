@@ -731,7 +731,7 @@ $icon = $iconFactory->getIcon('actions-edit', 'small');
 
 > **Deprecated: v14.3, scheduled for removal in v15.0**
 > **Source**: `typo3/cms-core` v14.3.0 vendor source, `Classes/Utility/GeneralUtility.php` (the `@deprecated` tag is on the method itself).
-> **Verify locally**: `grep -n "@deprecated" vendor/typo3/cms-core/Classes/Utility/GeneralUtility.php | grep -i getIndpEnv -A0 -B0` (then read 5 lines of context).
+> **Verify locally**: `grep -n -B5 "function getIndpEnv(" vendor/typo3/cms-core/Classes/Utility/GeneralUtility.php` -- shows the docblock with `@deprecated since TYPO3 v14.3, will be removed in TYPO3 v15.0` directly above the method signature (line ~2142 in v14.3.0).
 
 `GeneralUtility::getIndpEnv($name)` is deprecated since **TYPO3 v14.3** and scheduled for removal in **v15.0**. Replacement is `NormalizedParams` from the PSR-7 request.
 
