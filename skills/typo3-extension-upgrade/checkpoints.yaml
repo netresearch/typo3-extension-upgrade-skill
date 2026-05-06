@@ -1,6 +1,10 @@
 # Checkpoints for typo3-extension-upgrade skill
 # Validates extension readiness for TYPO3 version upgrades
 
+# RELOCATED FROM php-modernization-skill (v1.16.0 refocus):
+#   PM-35 -> TU-54 (mechanical: SingletonInterface in Classes/src)
+#   PM-36 -> TU-55 (LLM: SingletonInterface migration to DI scoping)
+
 version: 1
 skill_id: typo3-extension-upgrade
 
@@ -317,6 +321,13 @@ mechanical:
     severity: warning
     desc: "Should not use deprecated TYPO3_REQUESTTYPE constant (use ApplicationType)"
 
+  # === SINGLETONINTERFACE DEPRECATION (TYPO3 v14) ===
+  - id: TU-54
+    type: command
+    command: "! grep -rql 'SingletonInterface' Classes/ src/ 2>/dev/null"
+    severity: warning
+    desc: "SingletonInterface is deprecated in TYPO3 v14. Migrate to proper DI scoping (Services.yaml shared: true) unless the class must be used with GeneralUtility::setSingletonInstance in tests."
+
 llm_reviews:
   # === COMPREHENSIVE RECTOR REVIEW ===
   - id: TU-40
@@ -563,3 +574,22 @@ llm_reviews:
       Report each incompatible mock with file:line and recommended fix.
     severity: error
     desc: "Test mocks must reference methods valid on interfaces in all supported dependency versions"
+
+  # === SINGLETONINTERFACE DEPRECATION (TYPO3 v14) ===
+  - id: TU-55
+    domain: code-quality
+    prompt: |
+      Review the codebase for uses of TYPO3\CMS\Core\SingletonInterface.
+
+      Check for:
+      1. Classes implementing SingletonInterface — this is deprecated in TYPO3 v14
+      2. Suggest migration to proper DI container scoping (shared: true in Services.yaml)
+      3. EXCEPTION: Classes that must be used with GeneralUtility::setSingletonInstance()
+         in test fixtures. These may need to keep the interface temporarily until
+         the test setup is refactored to use proper DI container overrides.
+      4. Check if the singleton behavior is actually needed or if the class can
+         simply be a regular shared service (which is the DI container default).
+
+      Report specific files implementing SingletonInterface and migration path.
+    severity: warning
+    desc: "SingletonInterface is deprecated in TYPO3 v14 — migrate to DI container scoping"
