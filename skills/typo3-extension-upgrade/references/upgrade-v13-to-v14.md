@@ -410,3 +410,12 @@ See also:
 - `third-party-dependency-upgrades.md` — Symfony 7.3 / Doctrine DBAL 4 / Fluid 5 / CKE 47 bump notes
 - `verification.md` — success criteria
 - TYPO3 Core Changelog 14.0–14.3: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html
+
+## SingletonInterface deprecation (TYPO3 v14)
+
+`TYPO3\CMS\Core\SingletonInterface` is deprecated in v14. Code keeps working in v14.x, but every implementer needs a migration plan before v15. The replacement is the Symfony DI container's default behaviour: services declared in `Configuration/Services.yaml` are shared by default, so `shared: true` (or simply omitting `shared: false`) gives you the same one-instance-per-request semantics without the marker interface. Drop `implements SingletonInterface`, configure the service explicitly when its scope is non-trivial, and let the container manage the lifetime.
+
+The one common exception is classes registered through `GeneralUtility::setSingletonInstance()` in test fixtures — those rely on the static singleton registry, not the DI container, so the interface may need to stay until the test setup is refactored to use container overrides (`$this->getContainer()->set(...)` in functional tests, or proper service mocks in unit tests). The checkpoints surface this:
+
+- **TU-54** (mechanical) — flags any `SingletonInterface` reference under `Classes/` or `src/`.
+- **TU-55** (LLM review) — reviews each occurrence and proposes the DI-scoping migration, accounting for the test-fixture exception.
