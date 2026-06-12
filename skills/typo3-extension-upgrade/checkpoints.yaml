@@ -50,6 +50,18 @@ mechanical:
     severity: info
     desc: "Fractor config should use TYPO3 level sets"
 
+  - id: TU-56
+    type: command
+    pattern: 'cfg=""; for f in rector.php Build/rector.php Build/rector/rector.php; do [ -f "$f" ] && cfg="$f" && break; done; [ -z "$cfg" ] && exit 0; grep -q "UP_TO_TYPO3_14" "$cfg" && exit 0; grep -qE "UP_TO_TYPO3_1[0-3]" "$cfg" && exit 1; exit 0'
+    severity: warning
+    desc: "Rector Typo3LevelSetList should target the current LTS (UP_TO_TYPO3_14) — a stale set (e.g. UP_TO_TYPO3_13) passes TU-02 but silently skips all v14 migrations during the dry-run"
+
+  - id: TU-57
+    type: command
+    pattern: 'cfg=""; for f in rector.php Build/rector.php Build/rector/rector.php; do [ -f "$f" ] && cfg="$f" && break; done; [ -z "$cfg" ] && exit 0; grep -q "UP_TO_PHP_" "$cfg" && exit 0; exit 1'
+    severity: info
+    desc: "Rector PHP LevelSetList should be configured and target the minimum supported PHP version (the floor) — targeting the ceiling would rewrite code with newer-version syntax and break the floor. Verify the PHP ceiling statically with PHPStan/CI, not Rector"
+
   # === COMPOSER.JSON VERSION CONSTRAINTS ===
   - id: TU-06
     type: json_path
