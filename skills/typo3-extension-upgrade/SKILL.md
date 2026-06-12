@@ -57,19 +57,20 @@ Config templates in `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `php
 
 | Reference | Use when... |
 |-----------|-------------|
-| `references/pre-upgrade.md` | Starting an upgrade: planning checklist, version audit, risk assessment |
+| `references/pre-upgrade.md` | Planning checklist, version audit, risk assessment |
 | `references/api-changes.md` | Checking deprecated/removed APIs by TYPO3 version |
 | `references/api-traps.md` | Cross-version footguns: TCA restrictions, boot order, DI bypass |
 | `references/upgrade-v11-to-v12.md` | Upgrading from TYPO3 v11 to v12 |
 | `references/upgrade-v12-to-v13.md` | Upgrading from TYPO3 v12 to v13 |
 | `references/upgrade-v13-to-v14.md` | Upgrading from TYPO3 v13 to v14 |
-| `references/dual-compatibility.md` | Maintaining dual compatibility (v12 + v13) |
-| `references/real-world-patterns.md` | Looking for real-world migration examples |
-| `references/toolchain-output.md` | Understanding Rector/Fractor dry-run output |
+| `references/dual-compatibility.md` | Dual compatibility (v12 + v13) |
+| `references/real-world-patterns.md` | Real-world migration examples |
+| `references/toolchain-output.md` | Rector/Fractor dry-run output |
 | `references/troubleshooting.md` | Rector broke code, PHPStan errors, test failures |
-| `references/third-party-dependency-upgrades.md` | Upgrading non-TYPO3 dependencies (major version bumps, adapter patterns) |
-| `references/verification.md` | Checking success criteria and real-world testing |
+| `references/third-party-dependency-upgrades.md` | Non-TYPO3 dependencies (major version bumps, adapter patterns) |
+| `references/verification.md` | Success criteria and real-world testing |
 | `references/multi-version-worktrees.md` | Per-LTS worktree layout, backport workflow, cross-version CI matrix |
+| `references/audit-mode.md` | Assessing/estimating: ticket only non-automatable findings |
 
 ## External Resources
 
