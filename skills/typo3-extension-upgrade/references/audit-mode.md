@@ -6,8 +6,8 @@ Use this when the goal is to **assess/report** — produce an upgrade estimate o
 
 A dry-run only reveals what its configured target covers. A config left on a previous version passes the "tool exists" checkpoints but silently skips the relevant migrations.
 
-- **Rector** — set `Typo3LevelSetList::UP_TO_TYPO3_<target>` and `LevelSetList::UP_TO_PHP_<ceiling>` (checkpoints TU-56 / TU-57). When auditing without changing the repo, write a separate audit config and run with `--dry-run`.
-- **PHPStan** — set `phpVersion: { min: <floor>, max: <ceiling> }` (e.g. `80200`–`80500`) to verify the whole supported PHP range, not just the runtime version.
+- **Rector** — set `Typo3LevelSetList::UP_TO_TYPO3_<target>` for the TYPO3 migrations, and keep `LevelSetList::UP_TO_PHP_<floor>` at the **minimum** supported PHP. Targeting a higher PHP would rewrite code with newer-version syntax (e.g. typed class constants) and break the floor (checkpoints TU-56 / TU-57). When auditing without changing the repo, write a separate audit config and run with `--dry-run`.
+- **PHPStan** — set `phpVersion: { min: <floor>, max: <ceiling> }` (e.g. `80200`–`80500`; range form supported since PHPStan 1.10) to verify the whole supported PHP range. This is where the PHP **ceiling** (e.g. 8.5) is checked — not in Rector.
 
 ## Cross-reference, then ticket only the remainder
 

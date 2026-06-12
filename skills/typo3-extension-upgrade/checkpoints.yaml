@@ -58,9 +58,9 @@ mechanical:
 
   - id: TU-57
     type: command
-    pattern: 'cfg=""; for f in rector.php Build/rector.php Build/rector/rector.php; do [ -f "$f" ] && cfg="$f" && break; done; [ -z "$cfg" ] && exit 0; grep -qE "UP_TO_PHP_8[456]" "$cfg" && exit 0; grep -qE "UP_TO_PHP_8[0-3]" "$cfg" && exit 1; exit 0'
+    pattern: 'cfg=""; for f in rector.php Build/rector.php Build/rector/rector.php; do [ -f "$f" ] && cfg="$f" && break; done; [ -z "$cfg" ] && exit 0; grep -q "UP_TO_PHP_" "$cfg" && exit 0; exit 1'
     severity: info
-    desc: "Rector PHP LevelSetList should target the supported PHP ceiling (UP_TO_PHP_84/85) so version-specific deprecations (implicit-nullable 8.4+, 8.5 changes) are caught"
+    desc: "Rector PHP LevelSetList should be configured and target the minimum supported PHP version (the floor) — targeting the ceiling would rewrite code with newer-version syntax and break the floor. Verify the PHP ceiling statically with PHPStan/CI, not Rector"
 
   # === COMPOSER.JSON VERSION CONSTRAINTS ===
   - id: TU-06
