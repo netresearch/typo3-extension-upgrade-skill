@@ -31,6 +31,19 @@ Extension code only -- NOT for project/core upgrades.
 10. Test in target TYPO3 version(s)
 11. Verify success criteria (consult `references/verification.md`)
 
+## Audit mode: report vs. auto-fix
+
+When the goal is to **assess/report** (e.g. produce an upgrade estimate or file issues) rather than to apply the upgrade, do **not** create tickets for findings that the upgrade toolchain fixes automatically. Otherwise the backlog fills with noise.
+
+1. Pin the tool targets to the **upgrade target**, not the current state, before the dry-run:
+   - Rector: `Typo3LevelSetList::UP_TO_TYPO3_<target>` and `LevelSetList::UP_TO_PHP_<ceiling>` (a stale config silently skips the relevant migrations — see checkpoints TU-56/TU-57).
+   - PHPStan: set `phpVersion: { min: <floor>, max: <ceiling> }` to verify the whole supported PHP range (e.g. 8.2–8.5).
+2. Run `rector process --dry-run` and `fractor process --dry-run`; collect the **applied rules**.
+3. Run `phpstan analyse` with deprecation rules; collect the **deprecation findings**.
+4. **Cross-reference**: a PHPStan deprecation that has a matching Rector/Fractor rule is **auto-fixed on upgrade → do not ticket**. Only deprecations/findings **without** a matching rule need manual work → ticket those (plus logic bugs, design gaps, and config the tools skip such as `ext_emconf.php`).
+
+Ignore pure code-style rules (e.g. `ClassPropertyAssignToConstructorPromotionRector`) when deciding what is upgrade-relevant.
+
 ## When NOT to Apply Automatically
 
 Do NOT blindly apply Rector/Fractor if dual-version compatibility is needed,
