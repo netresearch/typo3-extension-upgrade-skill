@@ -5,8 +5,8 @@ description: "Use when upgrading TYPO3 extensions to newer LTS versions (v11->v1
 
 # TYPO3 Extension Upgrade Skill
 
-Systematic framework for upgrading TYPO3 extensions to newer LTS versions.
-Extension code only -- NOT for project/core upgrades.
+Framework for upgrading TYPO3 extensions to newer LTS versions.
+Extension code only, not project/core upgrades.
 
 ## Upgrade Toolkit
 
@@ -33,13 +33,13 @@ Extension code only -- NOT for project/core upgrades.
 
 ## When NOT to Apply Automatically
 
-Do NOT blindly apply Rector/Fractor if dual-version compatibility is needed,
-tests are missing, changes are unclear, or complex APIs (DBAL, Extbase) are
-affected. Instead: apply specific rules manually, test between each change.
+Do NOT blindly apply Rector/Fractor when dual-version compatibility, missing
+tests, unclear changes, or complex APIs (DBAL, Extbase) are involved. Instead
+apply rules manually, testing between changes.
 
 ## Third-Party Dependency Upgrades
 
-When `composer.json` widens constraints to a new major version: enumerate API usages, cross-reference the new version's API, flag interface/concrete-only methods, verify mocks against all supported versions, use adapter pattern for signature differences, run PHPStan against each major version. See `references/third-party-dependency-upgrades.md`.
+When `composer.json` widens a dependency to a new major version: enumerate API usages, cross-reference the new API, verify mocks, use adapter pattern for signature differences, run PHPStan per major version. See `references/third-party-dependency-upgrades.md`.
 
 ## Quick Commands
 
@@ -71,6 +71,7 @@ Config templates in `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `php
 | `references/verification.md` | Success criteria and real-world testing |
 | `references/multi-version-worktrees.md` | Per-LTS worktree layout, backport workflow, cross-version CI matrix |
 | `references/audit-mode.md` | Assessing/estimating: ticket only non-automatable findings |
+| `scripts/scan-deprecations.sh <path>` | Deterministic grep scan for deprecated/removed APIs and traps |
 
 ## External Resources
 
