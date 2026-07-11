@@ -84,7 +84,8 @@ check_14() {
 }
 
 check_15() {
-    grep -rn "->execute()" "$target/Classes/"
+    # -e: pattern starts with "-", which grep would otherwise parse as an option
+    grep -rne "->execute()" "$target/Classes/"
 }
 
 check_16() {
@@ -139,7 +140,8 @@ check_28() {
     # Find TypoScript userFunc references
     grep -rn "userFunc\|preUserFunc\|postUserFunc" "$target/Configuration/TypoScript/"
     # Find PHP classes referenced in TypoScript
-    grep -rn "->render\|->process" "$target/Configuration/TypoScript/" | grep -v "#"
+    # -e: pattern starts with "-", which grep would otherwise parse as an option
+    grep -rne "->render\|->process" "$target/Configuration/TypoScript/" | grep -v "#"
 }
 
 check_29() {
@@ -147,7 +149,8 @@ check_29() {
 }
 
 check_30() {
-    grep -rn "->getName()\|Type::getName" "$target/Classes/"
+    # -e: pattern starts with "-", which grep would otherwise parse as an option
+    grep -rne "->getName()\|Type::getName" "$target/Classes/"
 }
 
 check_31() {
@@ -201,7 +204,8 @@ check_42() {
 }
 
 check_43() {
-    grep -rn "->select(\|Connection::select" "$target/Classes"
+    # -e: pattern starts with "-", which grep would otherwise parse as an option
+    grep -rne "->select(\|Connection::select" "$target/Classes"
 }
 
 check_44() {
