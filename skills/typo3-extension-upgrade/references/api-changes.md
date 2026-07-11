@@ -435,6 +435,8 @@ grep -rn "BackendUtility::wrapClickMenuOnIcon\|getClickMenuOnIconTagParameters" 
 
 ## v12 → v13 Upgrade
 
+The `$TSFE` properties deprecated below are fully removed in v14.0 — see typo3-conformance's canonical [`v14-deprecations.md`](https://github.com/netresearch/typo3-conformance-skill/blob/main/skills/typo3-conformance/references/v14-deprecations.md) §1.3 (`TypoScriptFrontendController` removal, #107831) for the removal fact. This section keeps the v13 migration execution: search patterns and fix code.
+
 ### Request Attributes (Critical)
 
 **Search Pattern**
@@ -490,9 +492,11 @@ grep -rn "'type'\s*=>\s*'text'" Configuration/TCA/
 
 ## v13 → v14 Upgrade
 
+For the full v14 removal and deprecation fact catalog, see typo3-conformance's canonical [`v14-deprecations.md`](https://github.com/netresearch/typo3-conformance-skill/blob/main/skills/typo3-conformance/references/v14-deprecations.md). This section keeps upgrade execution: search patterns and fix code.
+
 ### TypoScript/TSconfig Callables Require #[AsAllowedCallable] Attribute (Critical)
 
-> **Breaking: #108054** - [Changelog](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.0/Breaking-108054-EnforceExplicitOpt-inForTypoScriptTSconfigCallables.html)
+> **Breaking: #108054** - [Changelog](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.0/Breaking-108054-EnforceExplicitOpt-inForTypoScriptTSconfigCallables.html) · canonical fact: v14-deprecations.md §1.9
 
 TYPO3 v14 requires explicit opt-in for methods callable through TypoScript/TSconfig. Without the attribute, calls fail with `AllowedCallableException`.
 
@@ -571,6 +575,8 @@ if ($type instanceof StringType || $type instanceof TextType) { }
 ```
 
 ### Icon::SIZE_* Constants Replaced with IconSize Enum
+
+**Removed in v14.0** (canonical fact: v14-deprecations.md §1.2).
 
 **Search Pattern**
 ```bash
@@ -729,6 +735,8 @@ $icon = $iconFactory->getIcon('actions-edit', 'small');
 
 ### GeneralUtility::getIndpEnv() Deprecated -- Use NormalizedParams (v14.3)
 
+> **Canonical fact entry**: v14-deprecations.md §2.4 `#109551`.
+
 > **Deprecated: v14.3, scheduled for removal in v15.0**
 > **Source**: `typo3/cms-core` v14.3.0 vendor source, `Classes/Utility/GeneralUtility.php` (the `@deprecated` tag is on the method itself).
 > **Verify locally**: `grep -n -B5 "function getIndpEnv(" vendor/typo3/cms-core/Classes/Utility/GeneralUtility.php` -- shows the docblock with `@deprecated since TYPO3 v14.3, will be removed in TYPO3 v15.0` directly above the method signature (line ~2142 in v14.3.0).
@@ -807,15 +815,7 @@ The migration is safe across the entire supported range with **no compatibility 
 
 ### Additional v14 Changes
 
-Monitor [Changelog-14](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html) for additional breaking changes.
-
-**Known Removals**
-- `ExtensionConfiguration::getAll()` - use `$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']`
-- `Type::getName()` in Doctrine DBAL - use `instanceof` checks
-- `Icon::SIZE_*` constants - use `IconSize` enum
-
-**Known Deprecations (v14.3, removal in v15.0)**
-- `GeneralUtility::getIndpEnv()` - use `NormalizedParams` from PSR-7 request
+For the complete v14 removal and deprecation catalog beyond the migration recipes above, see typo3-conformance's canonical `v14-deprecations.md`. Monitor [Changelog-14](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html) for changes not yet catalogued.
 
 ---
 
