@@ -148,3 +148,11 @@ See `third-party-dependency-upgrades.md` for detailed patterns and examples.
 | `@phpstan-ignore` masks runtime error | Suppresses analysis but code still fails at runtime | Refactor to adapter pattern |
 | Mock `->method()` fails | Mocked method removed in new version | Mock your own adapter interface instead |
 | PHPStan passes but tests fail | PHPStan only checks one installed version | Run against each major version in CI |
+
+## `UP_TO_*` sets are cumulative migrations — pin every axis to the FLOOR
+
+Source-verified mechanism: `Typo3LevelSetList::UP_TO_TYPO3_14` = `sets([UP_TO_TYPO3_13, Typo3SetList::TYPO3_14])` — "apply all upgrade rules up to and including NN", never "supports up to NN". The same floor principle applies to EVERY versioned set, not just the TYPO3 level:
+
+- **`PHPUnitSetList`**: an extension whose CI matrix includes PHP 8.2/8.3 resolves PHPUnit 11 there (PHPUnit 13 needs PHP ≥ 8.4.1) — `PHPUNIT_110` is correct, a higher set emits 12/13-only test APIs that break the low cells.
+- **Fractor**: same `UP_TO` semantics as Rector — a `13.4 + 14.3` extension uses `UP_TO_TYPO3_13` in BOTH tools (one real misconfig had Rector at 13 but Fractor at 14). Caveat: config migrations are sometimes more BC-tolerant than code — check per rule before assuming breakage.
+- **`LevelSetList::UP_TO_PHP_XX`** / `withPhpVersion()`: the PHP floor, same reasoning.
