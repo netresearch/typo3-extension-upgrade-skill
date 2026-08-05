@@ -9,6 +9,31 @@ When `composer.json` constraints widen to include a new major version of ANY dep
 - A dependency releases a new major version with breaking changes
 - Multi-version support is required (e.g., intervention/image v3 + v4)
 
+## Triage First: Which Majors Are Even Reachable
+
+Before analyzing any single dependency, triage the whole candidate set decisively —
+most "major update available" entries in a version-pinned TYPO3 project are hard-blocked
+by the core constraint, and guessing wastes analysis effort:
+
+```bash
+# 1. Full picture (works without vendor/, straight off the lock file)
+composer outdated --locked --format=json
+
+# 2. For every direct dependency with latest-status "update-possible":
+composer why-not --locked <package> <latest-version>
+```
+
+`why-not --locked` names the exact blocking constraint chain (e.g.
+`georgringer/news 14.0.3 requires typo3/cms-core ^13.4.20 || ^14.0` vs the root's
+`~12.4`) in seconds, with no resolver run and no composer.json edits. Sort the output
+into three buckets: blocked by the pinned platform (drop until the platform moves),
+blocked only by sibling packages you control (actionable via their releases), and
+genuinely installable (verify with `composer require --dry-run --no-install` in a
+scratch copy of composer.json+lock, never in the working tree). A 37-candidate list
+collapsed to 4 actionable updates in one such pass (2026-08-05). Caveat: `why-not`
+shows only the chains it finds relevant — an empty-looking answer is a lead for a
+dry-run probe, not proof of installability.
+
 ## Workflow: Third-Party Dependency Upgrade
 
 ### Step 1: Enumerate All Usages
