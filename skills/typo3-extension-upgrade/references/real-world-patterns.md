@@ -1,6 +1,6 @@
 # Real-World Upgrade Patterns
 
-> **Source**: netresearch/contexts extension upgrade from v11 to v12/v13 (2024-12)
+> **Source**: a production TYPO3 extension upgrade from v11 to v12/v13 (2024-12)
 
 ## Deprecation Patterns Discovered
 
