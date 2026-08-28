@@ -273,6 +273,10 @@ parameters:
 
 `phpstan/extension-installer` auto-loads any installed PHPStan extensions — once you remove `saschaegerer/phpstan-typo3` from the v12/v14 dev branches' `composer.json`, no manual `includes:` cleanup is needed.
 
+### `AjaxRequest.withQueryArguments()` double-encodes on v14 — undocumented, JS-only
+
+v14 rewired `withQueryArguments()` to use the new `UrlFactory.createSearchParams()` instead of v12/v13's `InputTransformer.toSearchParams()`, silently dropping a `decodeURI()` step that used to neutralize one layer of manual pre-encoding. Any extension JS calling `.withQueryArguments({ key: encodeURIComponent(value) })` — a common pattern for a FAL combined identifier (`storage:/path`) — breaks on v14 (double-encoded value, server-side resolution fails) while the identical code stays correct on v12/v13. Not listed in `Documentation/Changelog/14.0/` as a Breaking change. Full writeup with the fix and verification method: `api-traps.md`.
+
 ---
 
 ## Dual-version compatibility guards

@@ -180,6 +180,38 @@ done < /tmp/ext-classes.txt
 
 ---
 
+## v14 `AjaxRequest.withQueryArguments()` Dropped Its Decode-Neutralization Step — Undocumented, Version-Specific
+
+`@typo3/core/ajax/ajax-request.js`'s `withQueryArguments()` builds the query string differently per major version, and the difference is invisible from an extension's own unchanged JS.
+
+- **v12/v13**: routes the value through `InputTransformer.toSearchParams()`, which builds a `URLSearchParams`, serializes it, and then calls `decodeURI()` on the result. That `decodeURI()` step neutralizes exactly one prior layer of manual `encodeURIComponent()`/percent-encoding on the value (it leaves URI-reserved characters like `%3A`/`%2F` alone, but un-escapes a stray `%25` back to `%`). A caller that manually pre-encodes a value before passing it to `withQueryArguments()` still gets the correct, single-encoded value on the wire.
+- **v14**: `withQueryArguments()` was rewired to use the new `@typo3/core/factory/url-factory.js` module (`UrlFactory.createSearchParams()`) instead, appending the value onto the request URL's own `URLSearchParams` via `.append()` — with **no decode step at all**. The exact same manually-pre-encoded value now gets percent-encoded a second time (`%` → `%25`), producing a broken double-encoded value server-side (e.g. `1%3A%2Fcamino%2Ffile.pdf` → `1%253A%252Fcamino%252Ffile.pdf`).
+
+This is a real, reproducible behavior change (verified live: a v14 backend AJAX call using this pattern throws `InvalidFileException`/HTTP 500 when resolving the resulting identifier server-side; the identical code on v12/v13 resolves correctly), **not documented as a Breaking change** in TYPO3's official `Documentation/Changelog/14.0/` — the only related entry is `Feature-107104-IntroduceUrlFactoryJavaScriptModule.rst`, which describes `UrlFactory` as a new standalone utility and says nothing about `AjaxRequest`'s own internal implementation switching to it.
+
+**Symptom**: any extension JS that does `new AjaxRequest(url).withQueryArguments({ key: encodeURIComponent(someIdentifier) })` (a common pattern for passing a FAL combined identifier, `storage:/path`, which contains `:`/`/`) breaks silently on v14 with no visible in-page error unless the calling code explicitly renders an error state — the request still completes, the content container still refreshes, only the server-side resolution fails.
+
+**Search Pattern**:
+
+```bash
+grep -rn "encodeURIComponent" Resources/Public/JavaScript/
+# For each hit, check whether it feeds a .withQueryArguments()/.get() call, not a .post()/.put() body
+```
+
+**Fix** — do not pre-encode; let `withQueryArguments()` do it once (this is the shape that works correctly on v12, v13, AND v14):
+
+```js
+// ❌ Correct-looking on v12/v13, silently broken on v14
+new AjaxRequest(actionUrl).withQueryArguments({ target: encodeURIComponent(identifier) }).get();
+
+// ✅ Works on all three
+new AjaxRequest(actionUrl).withQueryArguments({ target: identifier }).get();
+```
+
+**Verification caveat**: do not assume a version-spanning "pre-existing bug" claim from extension-code similarity alone. The extension's own JS file can be byte-identical across v12/v13/v14 checkouts while TYPO3 core's own `ajax-request.js`/`input-transformer.js`/`url-factory.js` differ per version — read the actual vendored core JS for **each** version under test (`vendor/typo3/cms-core/Resources/Public/JavaScript/ajax/*.js`) rather than diffing only the extension's own file, and reproduce the exact call path in Node (or a real browser) per version before generalizing a fix across a v12/v13/v14 maintenance-branch set. See `verification.md`.
+
+---
+
 ## See Also
 
 - `upgrade-v11-to-v12.md` — v12 FormEngine DI nodes (`setData()` workaround for [#100670](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.4/Deprecation-100670-DIAwareFormEngineNodes.html))
