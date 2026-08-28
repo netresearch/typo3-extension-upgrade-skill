@@ -147,6 +147,39 @@ Same applies to `LayoutRootPaths` and `PartialRootPaths`.
 
 ---
 
+## v13 Backend CSS Reuses Generic Extension Class Names
+
+TYPO3 v13's backend stylesheet introduced new core UI components under short, generic class names — `.settings` in particular is now the Settings-module component (`background`, `border`, `box-shadow`, `display: grid; grid-template-columns: 1fr`). An extension's own Fluid markup from the v12 era that happens to use the same generic class name — often as a harmless, purely semantic marker with no CSS meaning at the time — silently inherits the new component's styling: a `<form class="... settings">` gets boxed with a border and every direct child (including buttons) gets stretched to full width by CSS Grid's default `stretch` alignment.
+
+This is invisible in a code diff: the port itself may not touch the affected template at all, since nothing in the markup or the extension's own code changed. It only shows up as a rendering regression against the real running v13 instance. `form-inline` / `form-inline-spaced` (Bootstrap 4-era utility classes many v12 extensions carry) are similarly dead weight in v13 — `form-inline` is reduced to `display: inline`, `form-inline-spaced` doesn't exist in the v13 core CSS at all — so leaving them in place is harmless on its own, but doesn't provide the layout it used to either.
+
+**Search Pattern** — grep every class actually used in the extension's Fluid templates against the installed core CSS, not just the ones that look obviously TYPO3-specific:
+
+```bash
+# Extract classes used in the extension's own templates
+grep -rhoP 'class="\K[^"]+' Resources/Private/**/*.html | tr ' ' '\n' | sort -u > /tmp/ext-classes.txt
+
+# Check which ones the v13 core backend CSS now defines
+while read -r cls; do
+    grep -q "^\.${cls}{" vendor/typo3/cms-backend/Resources/Public/Css/backend.css \
+        && echo "COLLISION: .$cls"
+done < /tmp/ext-classes.txt
+```
+
+**Fix** — drop classes that no longer serve a real purpose (checked against the current core CSS) rather than assuming old markup is inert:
+
+```html
+<!-- ❌ v12-era Bootstrap 4 classes, "settings" collides with the v13 core component -->
+<f:form class="form-inline form-inline-spaced settings" ...>
+
+<!-- ✅ let the surrounding Bootstrap defaults (or an explicit, non-colliding class) handle layout -->
+<f:form ...>
+```
+
+**How to verify**: this class of bug will not surface from a code review or a green test suite, load the actual backend module in a real running v13 instance and visually compare against v12. See `verification.md`.
+
+---
+
 ## See Also
 
 - `upgrade-v11-to-v12.md` — v12 FormEngine DI nodes (`setData()` workaround for [#100670](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.4/Deprecation-100670-DIAwareFormEngineNodes.html))
