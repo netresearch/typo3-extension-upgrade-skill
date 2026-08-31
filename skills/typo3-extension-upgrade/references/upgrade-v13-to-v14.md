@@ -123,11 +123,17 @@ single reference to one — anywhere, `Tests/` included — is a fatal error rat
 than a failing assertion. So search for all of them at once, before the table:
 
 ```bash
-grep -rnE 'TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface|FileNameValidator|CacheHashCalculator' Classes/ Tests/
+grep -rnE 'TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface' Classes/ Tests/
 ```
 
-Every hit is a fix, not a candidate. Then work the table for the rest, one row
-at a time rather than merged.
+Every hit is a fix, not a candidate: each of those seven names is a type that
+no longer exists, so any reference to one is a fatal error waiting to happen.
+
+Two neighbours in the table read like removals and are not. `FileNameValidator`
+and `CacheHashCalculator` both still exist — what went is a constructor
+argument and some public methods — so a match on either is a question rather
+than a defect, and they are deliberately absent from the search above. Work the
+table for those and for everything else, one row at a time rather than merged.
 
 ### Critical (most-hit)
 
