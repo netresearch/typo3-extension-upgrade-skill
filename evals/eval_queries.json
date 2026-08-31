@@ -42,6 +42,11 @@
       "query": "Saving a record in one of our backend modules silently keeps the previous value. Find out why.",
       "should_trigger": false,
       "note": "a runtime defect, unrelated to any version"
+    },
+    {
+      "query": "The upgrade is done and green in Classes/, but the whole unit suite refuses to start.",
+      "should_trigger": true,
+      "note": "a removed class referenced from a test file: PHPUnit resolves it while loading the suite, so nothing runs"
     }
   ]
 }
