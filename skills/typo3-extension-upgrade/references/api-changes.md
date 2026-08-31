@@ -1095,7 +1095,6 @@ In TYPO3 v12+, singleton services may persist state between tests. Reset the con
 #### Fix Pattern
 ```php
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Core\Bootstrap;
 
 protected function setUp(): void
 {
@@ -1103,13 +1102,16 @@ protected function setUp(): void
 
     // Drop every singleton instance the previous test left behind.
     GeneralUtility::resetSingletonInstances([]);
-
-    // Only if the test under it resolves backend routes. This initialises the
-    // backend router; it does not flush caches, whatever an older version of
-    // this recipe claimed.
-    Bootstrap::initializeBackendRouter();
 }
 ```
+
+Earlier revisions of this recipe followed the reset with
+`Bootstrap::initializeBackendRouter()` and a comment claiming it flushed all
+caches. It flushes nothing, and since v11.5 it does not exist: the method is
+present in `TYPO3\CMS\Core\Core\Bootstrap` in v9.5 and v10.4 and gone from
+v11.5, v12.4, v13.4 and v14.3 — checked against the core source for each. Copied
+into a v12+ test it is a fatal undefined-method call in `setUp()`, which fails
+every test in the class.
 
 ### Session State in Test Fixtures
 
