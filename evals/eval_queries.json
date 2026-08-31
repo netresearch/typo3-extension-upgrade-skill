@@ -47,6 +47,11 @@
       "query": "The upgrade is done and green in Classes/, but the whole unit suite refuses to start.",
       "should_trigger": true,
       "note": "a removed class referenced from a test file: PHPUnit resolves it while loading the suite, so nothing runs"
+    },
+    {
+      "query": "Our extension's composer.json now names v14, but composer refuses it — the constraint conflicts with the temporary one and nothing installs.",
+      "should_trigger": true,
+      "note": "usually the extension's own constraint written as ^14.4, a minor that does not exist"
     }
   ]
 }
