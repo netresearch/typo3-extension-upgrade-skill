@@ -42,13 +42,13 @@ Search your extension's PHP code (e.g., `Classes/`, `Tests/`, `Configuration/`, 
 
 ```bash
 # Find all imports/use statements for the package namespace
-grep -rn "use Vendor\\Package\\" Classes/ Tests/ Tests/ Configuration/ Resources/
+grep -rn "use Vendor\\Package\\" Classes/ Tests/ Configuration/ Resources/
 
 # Find all method calls on objects of that type
-grep -rn "->methodName(" Classes/ Tests/ Tests/ Configuration/ Resources/
+grep -rne "->methodName(" Classes/ Tests/ Configuration/ Resources/
 
 # Find all static calls
-grep -rn "Vendor\\Package\\ClassName::" Classes/ Tests/ Tests/ Configuration/ Resources/
+grep -rn "Vendor\\Package\\ClassName::" Classes/ Tests/ Configuration/ Resources/
 ```
 
 ### Step 2: Cross-Reference Against New Version's API

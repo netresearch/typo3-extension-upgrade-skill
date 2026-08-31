@@ -13,7 +13,7 @@ This bites hardest in admin tooling, cleanup scripts, and audit features that ex
 ### Search Pattern
 
 ```bash
-grep -rn "->select(\|Connection::select" Classes/ Tests/
+grep -rne "->select(\|Connection::select" Classes/ Tests/
 ```
 
 **Fix** — drop down to `QueryBuilder` and remove restrictions explicitly:

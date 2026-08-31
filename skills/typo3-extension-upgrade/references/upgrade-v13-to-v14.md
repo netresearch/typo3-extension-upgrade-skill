@@ -96,7 +96,7 @@ $rectorConfig->sets([
 
 All 98 breakers landed in v14.0. **If your extension compiles against v14.0, it's already forward-compatible with 14.1/14.2/14.3.**
 
-**Every search below covers `Tests/` as well as `Classes/`, and that is not tidiness.** A removed class referenced from a test file does not fail one test — PHPUnit resolves the class while *loading* the suite, so the run dies before a single test executes:
+**Every search below that reads PHP covers `Tests/` as well as `Classes/`, and that is not tidiness.** A removed class referenced from a test file does not fail one test — PHPUnit resolves the class while *loading* the suite, so the run dies before a single test executes:
 
 ```
 An error occurred inside PHPUnit.
@@ -105,6 +105,8 @@ Location: Tests/Unit/Classes/Context/AbstractContextTest.php:38
 ```
 
 The extension's `Classes/` was clean, the dependencies resolved, v14.3 installed — and the suite reported a total failure whose cause the prescribed searches could not see, because they looked only in `Classes/`. Measured on an upgrade that got everything else right, four times over two days. The test suite is production code for the purposes of an upgrade.
+
+The rows that search `Configuration/`, `Resources/Private/` or a single subdirectory of `Classes/` are unchanged: a Fluid template or a TCA file has no counterpart under `Tests/`.
 
 ### Critical (most-hit)
 
@@ -116,7 +118,7 @@ The extension's `Classes/` was clean, the dependencies resolved, v14.3 installed
 | Fluid `StandaloneView`, `TemplateView` removed | #105377 | `grep -rn "StandaloneView\|AbstractTemplateView" Classes/ Tests/` | `Core\View\ViewFactoryInterface` |
 | Fluid underscore-prefixed variables forbidden | #108148 | `grep -rEn '\{_[a-zA-Z]' Resources/Private/` | Rename variables |
 | Extbase annotation namespace removed | #107229 | `grep -rn "@Extbase\\\\Annotation" Classes/ Tests/` | PHP attributes `#[Validate]`, `#[IgnoreValidation]` |
-| Magic repo finders removed | #105377 | `grep -rn "->findBy[A-Z]\|->findOneBy[A-Z]\|->countBy[A-Z]" Classes/ Tests/` | `createQuery()` builder |
+| Magic repo finders removed | #105377 | `grep -rne "->findBy[A-Z]\|->findOneBy[A-Z]\|->countBy[A-Z]" Classes/ Tests/` | `createQuery()` builder |
 | `HashService` (Extbase) removed | #105377 | `grep -rn "HashService\|GeneralUtility::hmac(" Classes/ Tests/` | Core cipher service (#108002) |
 | TCA `subtype_value_field` / `subtypes_addlist` removed | #105377 | `grep -rn "subtype_value_field\|subtypes_addlist" Configuration/TCA/` | Record-type flex-form handling |
 | TCA `control.searchFields` removed | #106972 | `grep -rn "searchFields" Configuration/TCA/` | Configurable search TCA |
@@ -126,7 +128,7 @@ The extension's `Classes/` was clean, the dependencies resolved, v14.3 installed
 | EXT:form hooks removed (10 hooks) | many | `grep -rn "'afterBuildingFinished'\|beforeFormCreate\|beforeFormSave\|beforeFormDelete\|beforeFormDuplicate\|initializeFormElement\|beforeRemoveFromParentRenderable\|afterInitializeCurrentPage\|afterSubmit\|beforeRendering" ext_localconf.php Classes/` | PSR-14 events |
 | `TypolinkBuilder` signature changed | #106405 | `grep -rn "extends AbstractTypolinkBuilder\|TypolinkBuilder" Classes/ Tests/` | Implement `TypolinkBuilderInterface` |
 | Bootstrap Modal → native `<dialog>` | #107443 | `grep -rn "Modal.advanced\|bootstrap.*modal" Resources/Public/JavaScript/` | Native `<dialog>` API |
-| `MailMessage->send()` removed | #108097 | `grep -rn "->send()" Classes/ Tests/` (filter for MailMessage) | Dispatch via Mailer service |
+| `MailMessage->send()` removed | #108097 | `grep -rne "->send()" Classes/ Tests/` (filter for MailMessage) | Dispatch via Mailer service |
 | HMAC algorithm SHA1 → SHA256 | #106307 | automatic via Rector | Rotate existing HMACs if persisted |
 | `LoginProviderInterface::render()` → `modifyView()` | internal | `grep -rn "LoginProviderInterface" Classes/ Tests/` | Implement `modifyView()` |
 | `composer.json` required in classic mode | #108310 | check presence in project root | Create `composer.json` with extension autoload |

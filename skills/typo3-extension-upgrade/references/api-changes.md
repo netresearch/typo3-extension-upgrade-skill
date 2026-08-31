@@ -227,9 +227,9 @@ grep -rn "'wizards'\s*=>\|'wizard_'" Configuration/TCA/
 
 ## v11 → v12 Upgrade
 
-### Doctrine DBAL 4.x (Critical)
+### Doctrine DBAL: PDO constants removed
 
-#### PDO Constants Removed
+TYPO3 v12 ships DBAL 3. The DBAL 4 changes that used to sit here moved to v12 → v13, where they belong.
 
 #### Search Pattern
 ```bash
@@ -249,52 +249,6 @@ grep -rn "PDO::PARAM_" Classes/ Tests/
 ```php
 use TYPO3\CMS\Core\Database\Connection;
 ```
-
-#### QueryBuilder execute() Removed
-
-#### Search Pattern
-```bash
-grep -rn "->execute()" Classes/ Tests/
-```
-
-#### Replace
-
-| Before (DBAL 3.x) | After (DBAL 4.x) |
-|-------------------|------------------|
-| `$queryBuilder->execute()` (SELECT) | `$queryBuilder->executeQuery()` |
-| `$queryBuilder->execute()` (INSERT/UPDATE/DELETE) | `$queryBuilder->executeStatement()` |
-
-#### Example Migration
-```php
-// Before (DBAL 3.x)
-$result = $queryBuilder
-    ->select('*')
-    ->from('pages')
-    ->execute();
-
-// After (DBAL 4.x)
-$result = $queryBuilder
-    ->select('*')
-    ->from('pages')
-    ->executeQuery();
-```
-
-#### ParameterType Enum (PHPStan Warning)
-
-In Doctrine DBAL 4.x, type parameters changed from `int` to `ParameterType` enum:
-
-```php
-// This works but PHPStan may complain:
-->createNamedParameter($value, Connection::PARAM_INT)
-
-// PHPStan ignore pattern for dual v12/v13 compatibility:
-# Build/phpstan.neon
-parameters:
-    ignoreErrors:
-        - '~Parameter \\#2 \\$type of method .* expects .*, int given~'
-```
-
-**Note**: TYPO3 Core provides `Connection::PARAM_*` constants that work across versions, but PHPStan may still report type mismatches during the transition period
 
 ### GeneralUtility Deprecated Methods
 
@@ -437,6 +391,54 @@ grep -rn "BackendUtility::wrapClickMenuOnIcon\|getClickMenuOnIconTagParameters" 
 
 The `$TSFE` properties deprecated below are fully removed in v14.0 — see typo3-conformance's canonical [`v14-deprecations.md`](https://github.com/netresearch/typo3-conformance-skill/blob/main/skills/typo3-conformance/references/v14-deprecations.md) §1.3 (`TypoScriptFrontendController` removal, #107831) for the removal fact. This section keeps the v13 migration execution: search patterns and fix code.
 
+### Doctrine DBAL 4: QueryBuilder execute() removed
+
+Deprecated in v12, removed in v13 together with the DBAL 4 upgrade. It sat under v11 → v12 in earlier revisions of this file, which is one major too early.
+
+#### Search Pattern
+```bash
+grep -rne "->execute()" Classes/ Tests/
+```
+
+#### Replace
+
+| Before (DBAL 3.x) | After (DBAL 4.x) |
+|-------------------|------------------|
+| `$queryBuilder->execute()` (SELECT) | `$queryBuilder->executeQuery()` |
+| `$queryBuilder->execute()` (INSERT/UPDATE/DELETE) | `$queryBuilder->executeStatement()` |
+
+#### Example Migration
+```php
+// Before (DBAL 3.x)
+$result = $queryBuilder
+    ->select('*')
+    ->from('pages')
+    ->execute();
+
+// After (DBAL 4.x)
+$result = $queryBuilder
+    ->select('*')
+    ->from('pages')
+    ->executeQuery();
+```
+
+#### ParameterType Enum (PHPStan Warning)
+
+In Doctrine DBAL 4.x, type parameters changed from `int` to `ParameterType` enum:
+
+```php
+// This works but PHPStan may complain:
+->createNamedParameter($value, Connection::PARAM_INT)
+
+// PHPStan ignore pattern for dual v12/v13 compatibility:
+# Build/phpstan.neon
+parameters:
+    ignoreErrors:
+        - '~Parameter \\#2 \\$type of method .* expects .*, int given~'
+```
+
+**Note**: TYPO3 Core provides `Connection::PARAM_*` constants that work across versions, but PHPStan may still report type mismatches during the transition period
+
 ### Request Attributes (Critical)
 
 #### Search Pattern
@@ -505,7 +507,7 @@ TYPO3 v14 requires explicit opt-in for methods callable through TypoScript/TScon
 # Find TypoScript userFunc references
 grep -rn "userFunc\|preUserFunc\|postUserFunc" Configuration/TypoScript/
 # Find PHP classes referenced in TypoScript
-grep -rn "->render\|->process" Configuration/TypoScript/ | grep -v "#"
+grep -rne "->render\|->process" Configuration/TypoScript/ | grep -v "#"
 ```
 
 #### Affected
@@ -555,7 +557,7 @@ $extConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['my_extension'] ?? [];
 
 #### Search Pattern
 ```bash
-grep -rn "->getName()\|Type::getName" Classes/ Tests/
+grep -rne "->getName()\|Type::getName" Classes/ Tests/
 ```
 
 #### Replace
@@ -580,7 +582,7 @@ if ($type instanceof StringType || $type instanceof TextType) { }
 
 #### Search Pattern
 ```bash
-grep -rn "Icon::SIZE_SMALL\|Icon::SIZE_DEFAULT\|Icon::SIZE_MEDIUM\|Icon::SIZE_LARGE" Classes/ Tests/
+grep -rnE "Icon::SIZE_(SMALL|DEFAULT|MEDIUM|LARGE|MEGA|OVERLAY)" Classes/ Tests/
 ```
 
 #### Replace
@@ -828,7 +830,10 @@ PHP 8.4 deprecates implicit nullable parameters. This affects all TYPO3 versions
 
 #### Search Pattern
 ```bash
-# Find parameters with null default but no explicit nullable type
+# Find parameters with null default but no explicit nullable type.
+# One line at a time, so a signature broken across lines slips through: this is
+# a first pass, not the verdict. The authoritative check is a parser --
+# `rector process --dry-run` with the PHP 8.4 set, or PHPStan at level 6+.
 grep -rn '\(.*\$[a-zA-Z_]* = null\)' Classes/ Tests/ | grep -v '?[a-zA-Z_\\]*\s*\$'
 ```
 
@@ -1032,7 +1037,8 @@ grep -rn "\$TSFE->fe_user\|\$TSFE->page\|\$TSFE->rootLine" Classes/ Tests/
 # v13→v14.3: getIndpEnv() deprecation (use NormalizedParams)
 grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Tests/ Configuration/
 
-# PHP 8.4: Implicit nullable parameters
+# PHP 8.4: Implicit nullable parameters (line-based; a signature broken across
+# lines slips through -- confirm with `rector process --dry-run`)
 grep -rn '\$[a-zA-Z_]* = null)' Classes/ Tests/ | grep -v '?'
 
 # PHP 8.4: Old TCA items format
@@ -1074,9 +1080,11 @@ After making changes:
 
 When upgrading extensions, tests often need adjustments to work with new TYPO3 versions.
 
-### Functional Test Container Isolation
+### Unit Test Container Isolation
 
-In TYPO3 v12+, singleton services may persist state between tests. Reset the Container before each test:
+In TYPO3 v12+, singleton services may persist state between tests. Reset the container before each test.
+
+**`UnitTestCase` only.** `FunctionalTestCase` resets instance state through its own lifecycle — it calls `GeneralUtility::purgeInstances()` for you — and a hand-rolled reset in a functional test fights that rather than helping it. On `UnitTestCase`, prefer the property the testing framework provides, `protected bool $resetSingletonInstances = true;`, over calling the reset yourself.
 
 #### Problem Pattern
 ```php
@@ -1093,10 +1101,12 @@ protected function setUp(): void
 {
     parent::setUp();
 
-    // Reset Container to ensure clean state
+    // Drop every singleton instance the previous test left behind.
     GeneralUtility::resetSingletonInstances([]);
 
-    // Flush all caches for complete reset
+    // Only if the test under it resolves backend routes. This initialises the
+    // backend router; it does not flush caches, whatever an older version of
+    // this recipe claimed.
     Bootstrap::initializeBackendRouter();
 }
 ```
