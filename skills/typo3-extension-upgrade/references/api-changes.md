@@ -8,12 +8,12 @@ Search patterns, replacements, and key breaking changes organized by TYPO3 versi
 
 ### Database Layer: TYPO3_DB → Doctrine DBAL
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "\$GLOBALS\['TYPO3_DB'\]\|exec_SELECTquery\|exec_INSERTquery\|exec_UPDATEquery\|exec_DELETEquery" Classes/
+grep -rn "\$GLOBALS\['TYPO3_DB'\]\|exec_SELECTquery\|exec_INSERTquery\|exec_UPDATEquery\|exec_DELETEquery" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before (v7) | After (v8+) |
 |-------------|-------------|
@@ -23,7 +23,7 @@ grep -rn "\$GLOBALS\['TYPO3_DB'\]\|exec_SELECTquery\|exec_INSERTquery\|exec_UPDA
 | `$GLOBALS['TYPO3_DB']->exec_DELETEquery()` | `$queryBuilder->delete()` |
 | `$GLOBALS['TYPO3_DB']->fullQuoteStr()` | `$queryBuilder->createNamedParameter()` |
 
-**Example Migration**
+#### Example Migration
 ```php
 // Before (v7)
 $rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', 'tt_content', 'pid=' . $pid);
@@ -40,7 +40,7 @@ $rows = $queryBuilder
 
 ### ExtJS/Prototype Removal
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "Ext\.onReady\|new Ext\.\|Prototype\.\|Element\.extend" Resources/
 ```
@@ -49,12 +49,12 @@ grep -rn "Ext\.onReady\|new Ext\.\|Prototype\.\|Element\.extend" Resources/
 
 ### Icon Factory
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "IconUtility::\|t3skin\|t3lib_iconWorks" Classes/
+grep -rn "IconUtility::\|t3skin\|t3lib_iconWorks" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before | After |
 |--------|-------|
@@ -67,7 +67,7 @@ grep -rn "IconUtility::\|t3skin\|t3lib_iconWorks" Classes/
 
 ### Site Configuration Introduction
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "sys_domain\|config\.baseURL\|absRefPrefix\s*=\s*auto" Configuration/
 ```
@@ -76,12 +76,12 @@ grep -rn "sys_domain\|config\.baseURL\|absRefPrefix\s*=\s*auto" Configuration/
 
 ### PSR-15 Middleware
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "AbstractUserAuthentication\|tslib_fe\|tslib_cObj" Classes/
+grep -rn "AbstractUserAuthentication\|tslib_fe\|tslib_cObj" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before | After |
 |--------|-------|
@@ -91,7 +91,7 @@ grep -rn "AbstractUserAuthentication\|tslib_fe\|tslib_cObj" Classes/
 
 ### Routing API
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "tx_realurl\|cooluri\|simulatestatic" Configuration/
 ```
@@ -100,9 +100,9 @@ grep -rn "tx_realurl\|cooluri\|simulatestatic" Configuration/
 
 ### Signal/Slot Deprecation Start
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "SignalSlotDispatcher\|->connect\(" Classes/
+grep -rn "SignalSlotDispatcher\|->connect\(" Classes/ Tests/
 ```
 
 **Note**: Mark for migration to PSR-14 Events (complete in v10).
@@ -113,7 +113,7 @@ grep -rn "SignalSlotDispatcher\|->connect\(" Classes/
 
 ### Symfony 5 Upgrade
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "Symfony\\\\Component\\\\Console\\\\Command\|setDescription\|setHelp" Classes/Command/
 ```
@@ -122,9 +122,9 @@ grep -rn "Symfony\\\\Component\\\\Console\\\\Command\|setDescription\|setHelp" C
 
 ### Dependency Injection
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "GeneralUtility::makeInstance\|ObjectManager::get" Classes/
+grep -rn "GeneralUtility::makeInstance\|ObjectManager::get" Classes/ Tests/
 ```
 
 **Replace**: Use constructor injection with `Services.yaml`.
@@ -141,12 +141,12 @@ services:
 
 ### PSR-14 Events
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "SignalSlotDispatcher\|->emit\|->connect\(" Classes/
+grep -rn "SignalSlotDispatcher\|->emit\|->connect\(" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before | After |
 |--------|-------|
@@ -155,7 +155,7 @@ grep -rn "SignalSlotDispatcher\|->emit\|->connect\(" Classes/
 
 ### Fluid Namespace
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "{namespace\|xmlns:f=" Resources/Private/
 ```
@@ -177,12 +177,12 @@ grep -rn "{namespace\|xmlns:f=" Resources/Private/
 
 ### Fluid Standalone
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "TYPO3Fluid\|StandaloneView\|setTemplatePathAndFilename" Classes/
+grep -rn "TYPO3Fluid\|StandaloneView\|setTemplatePathAndFilename" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 ```php
 // Before
 $view->setTemplatePathAndFilename($templatePath);
@@ -194,7 +194,7 @@ $view->setTemplateRootPaths([$rootPath]);
 
 ### Backend Controller Changes
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "extends ActionController\|AbstractModule" Classes/Controller/
 ```
@@ -216,7 +216,7 @@ public function indexAction(): ResponseInterface {
 
 ### TCA Wizard Changes
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "'wizards'\s*=>\|'wizard_'" Configuration/TCA/
 ```
@@ -231,12 +231,12 @@ grep -rn "'wizards'\s*=>\|'wizard_'" Configuration/TCA/
 
 #### PDO Constants Removed
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "PDO::PARAM_" Classes/
+grep -rn "PDO::PARAM_" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before | After |
 |--------|-------|
@@ -245,26 +245,26 @@ grep -rn "PDO::PARAM_" Classes/
 | `PDO::PARAM_BOOL` | `Connection::PARAM_BOOL` |
 | `PDO::PARAM_NULL` | `Connection::PARAM_NULL` |
 
-**Required Import**
+#### Required Import
 ```php
 use TYPO3\CMS\Core\Database\Connection;
 ```
 
 #### QueryBuilder execute() Removed
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "->execute()" Classes/
+grep -rn "->execute()" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before (DBAL 3.x) | After (DBAL 4.x) |
 |-------------------|------------------|
 | `$queryBuilder->execute()` (SELECT) | `$queryBuilder->executeQuery()` |
 | `$queryBuilder->execute()` (INSERT/UPDATE/DELETE) | `$queryBuilder->executeStatement()` |
 
-**Example Migration**
+#### Example Migration
 ```php
 // Before (DBAL 3.x)
 $result = $queryBuilder
@@ -298,12 +298,12 @@ parameters:
 
 ### GeneralUtility Deprecated Methods
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "GeneralUtility::_GET\|GeneralUtility::_POST\|GeneralUtility::_GP" Classes/
+grep -rn "GeneralUtility::_GET\|GeneralUtility::_POST\|GeneralUtility::_GP" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before | After |
 |--------|-------|
@@ -311,7 +311,7 @@ grep -rn "GeneralUtility::_GET\|GeneralUtility::_POST\|GeneralUtility::_GP" Clas
 | `GeneralUtility::_POST('param')` | `$_POST['param'] ?? null` |
 | `GeneralUtility::_GP('param')` | `$_GET['param'] ?? $_POST['param'] ?? null` |
 
-**For Controllers/Middleware (PSR-7)**
+#### For Controllers/Middleware (PSR-7)
 ```php
 // GET parameters
 $value = $request->getQueryParams()['param'] ?? null;
@@ -322,12 +322,12 @@ $value = $request->getParsedBody()['param'] ?? null;
 
 ### TCA Required Field
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "'eval'.*'required'" Configuration/TCA/
 ```
 
-**Replace**
+#### Replace
 ```php
 // Before
 'config' => [
@@ -345,12 +345,12 @@ grep -rn "'eval'.*'required'" Configuration/TCA/
 
 ### TCA inputLink → type=link
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "'renderType' => 'inputLink'" Configuration/TCA/
 ```
 
-**Replace**
+#### Replace
 ```php
 // Before (deprecated in v12)
 'config' => [
@@ -369,12 +369,12 @@ grep -rn "'renderType' => 'inputLink'" Configuration/TCA/
 
 ### Form Element Data Structure
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "itemFormElID" Classes/
+grep -rn "itemFormElID" Classes/ Tests/
 ```
 
-**Fix Pattern**
+#### Fix Pattern
 ```php
 // Before (removed in v12)
 $id = $this->data['parameterArray']['itemFormElID'];
@@ -386,12 +386,12 @@ $baseId = trim($baseId, '_');
 
 ### xml2array Null Handling
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "xml2array" Classes/
+grep -rn "xml2array" Classes/ Tests/
 ```
 
-**Fix Pattern**
+#### Fix Pattern
 ```php
 // Before
 if ($row['field'] !== '') {
@@ -406,7 +406,7 @@ if (!empty($row['field'])) {
 
 ### FlexForm Structure (Fractor handles)
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "<required>1</required>" Configuration/FlexForms/
 ```
@@ -415,7 +415,7 @@ grep -rn "<required>1</required>" Configuration/FlexForms/
 
 ### TypoScript Conditions
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "\[end\]" Configuration/TypoScript/
 ```
@@ -424,9 +424,9 @@ grep -rn "\[end\]" Configuration/TypoScript/
 
 ### Click Menu Parameters
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "BackendUtility::wrapClickMenuOnIcon\|getClickMenuOnIconTagParameters" Classes/
+grep -rn "BackendUtility::wrapClickMenuOnIcon\|getClickMenuOnIconTagParameters" Classes/ Tests/
 ```
 
 **Fix**: Remove 4th parameter if `'true'` or `'1'`.
@@ -439,12 +439,12 @@ The `$TSFE` properties deprecated below are fully removed in v14.0 — see typo3
 
 ### Request Attributes (Critical)
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "\$TSFE->fe_user\|\$GLOBALS\['TSFE'\]->fe_user" Classes/
+grep -rn "\$TSFE->fe_user\|\$GLOBALS\['TSFE'\]->fe_user" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before (v12) | After (v13) |
 |--------------|-------------|
@@ -455,7 +455,7 @@ grep -rn "\$TSFE->fe_user\|\$GLOBALS\['TSFE'\]->fe_user" Classes/
 
 ### Site Sets Introduction
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "ext_typoscript_setup\.typoscript\|ext_typoscript_constants"
 ```
@@ -472,7 +472,7 @@ dependencies:
 
 ### Backend Module Registration
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "registerModule\|TYPO3_MOD_PATH" ext_tables.php
 ```
@@ -481,7 +481,7 @@ grep -rn "registerModule\|TYPO3_MOD_PATH" ext_tables.php
 
 ### TCA Type Changes
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "'type'\s*=>\s*'text'" Configuration/TCA/
 ```
@@ -500,7 +500,7 @@ For the full v14 removal and deprecation fact catalog, see typo3-conformance's c
 
 TYPO3 v14 requires explicit opt-in for methods callable through TypoScript/TSconfig. Without the attribute, calls fail with `AllowedCallableException`.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 # Find TypoScript userFunc references
 grep -rn "userFunc\|preUserFunc\|postUserFunc" Configuration/TypoScript/
@@ -508,7 +508,7 @@ grep -rn "userFunc\|preUserFunc\|postUserFunc" Configuration/TypoScript/
 grep -rn "->render\|->process" Configuration/TypoScript/ | grep -v "#"
 ```
 
-**Affected**
+#### Affected
 - `userFunc` in USER/USER_INT content objects
 - `preUserFunc`, `postUserFunc`, `preUserFuncInt`, `postUserFuncInt` in stdWrap
 - TSconfig `renderFunc` in suggest wizard
@@ -534,12 +534,12 @@ class MyProcessor
 
 ### ExtensionConfiguration::getAll() Removed (Critical)
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "ExtensionConfiguration::getAll\|->getAll()" Classes/
+grep -rn "ExtensionConfiguration::getAll\|->getAll()" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 ```php
 // Before (removed in v14)
 $allConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class)->getAll();
@@ -553,12 +553,12 @@ $extConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['my_extension'] ?? [];
 
 ### Doctrine DBAL 4.x Type::getName() Removed
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "->getName()\|Type::getName" Classes/
+grep -rn "->getName()\|Type::getName" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 ```php
 // Before (DBAL 3.x)
 use Doctrine\DBAL\Types\Type;
@@ -578,12 +578,12 @@ if ($type instanceof StringType || $type instanceof TextType) { }
 
 **Removed in v14.0** (canonical fact: v14-deprecations.md §1.2).
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "Icon::SIZE_SMALL\|Icon::SIZE_DEFAULT\|Icon::SIZE_MEDIUM\|Icon::SIZE_LARGE" Classes/
+grep -rn "Icon::SIZE_SMALL\|Icon::SIZE_DEFAULT\|Icon::SIZE_MEDIUM\|Icon::SIZE_LARGE" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 ```php
 // Before (deprecated)
 use TYPO3\CMS\Core\Imaging\Icon;
@@ -605,12 +605,12 @@ $icon = $iconFactory->getIcon('actions-edit', IconSize::SMALL);
 
 ### f:uri.resource Not Available in Non-Extbase Modules
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "f:uri.resource\|<f:uri.resource" Resources/Private/
 ```
 
-**Replace**
+#### Replace
 ```html
 <!-- Before (fails in non-Extbase backend modules) -->
 <link rel="stylesheet" href="{f:uri.resource(path:'Css/backend.css')}" />
@@ -623,7 +623,7 @@ grep -rn "f:uri.resource\|<f:uri.resource" Resources/Private/
 
 ### Scheduler Interface Signature Changes
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "AdditionalFieldProviderInterface\|getAdditionalFields" Classes/Task/
 ```
@@ -649,12 +649,12 @@ public function getAdditionalFields(
 
 TYPO3 v14 uses Bootstrap 5. Update CSS classes in templates.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "btn-default\|badge-primary\|badge-success\|badge-danger\|badge-warning\|badge-info" Resources/
 ```
 
-**Replace**
+#### Replace
 
 | Before (Bootstrap 4) | After (Bootstrap 5) |
 |---------------------|---------------------|
@@ -669,12 +669,12 @@ grep -rn "btn-default\|badge-primary\|badge-success\|badge-danger\|badge-warning
 
 When checking for custom TCA field types, use `renderType`, not `type`.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "\['config'\]\['type'\]" Classes/Hook/
 ```
 
-**Fix**
+#### Fix
 ```php
 // ❌ Wrong - checks base type (input, text, etc.)
 $renderType = $fieldConfig['config']['type'] ?? '';
@@ -687,12 +687,12 @@ $renderType = $fieldConfig['config']['renderType'] ?? '';
 
 TYPO3 v14 enforces stricter WCAG 2.1 AA compliance. Add ARIA attributes to templates.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "role=\"main\"\|aria-label\|aria-describedby" Resources/Private/
 ```
 
-**Required Additions**
+#### Required Additions
 ```html
 <!-- Main content wrapper -->
 <div class="module" role="main" aria-label="My Module">
@@ -736,7 +736,6 @@ $icon = $iconFactory->getIcon('actions-edit', 'small');
 ### GeneralUtility::getIndpEnv() Deprecated -- Use NormalizedParams (v14.3)
 
 > **Canonical fact entry**: v14-deprecations.md §2.4 `#109551`.
-
 > **Deprecated: v14.3, scheduled for removal in v15.0**
 > **Source**: `typo3/cms-core` v14.3.0 vendor source, `Classes/Utility/GeneralUtility.php` (the `@deprecated` tag is on the method itself).
 > **Verify locally**: `grep -n -B5 "function getIndpEnv(" vendor/typo3/cms-core/Classes/Utility/GeneralUtility.php` -- shows the docblock with `@deprecated since TYPO3 v14.3, will be removed in TYPO3 v15.0` directly above the method signature (line ~2142 in v14.3.0).
@@ -745,9 +744,9 @@ $icon = $iconFactory->getIcon('actions-edit', 'small');
 
 > ⚠️ Don't trust AI assistants on this deprecation timing. Gemini Code Assist has been observed claiming `getIndpEnv()` was deprecated in v13.0 / removed in v14.0, and that `NormalizedParams::createFromServerParams()` was removed in v14.0 in favour of a (non-existent) `NormalizedParamsFactory` class. All three claims are wrong -- verified false against `typo3/cms-core` v14.3.0 vendor source. Always verify deprecation timing by reading the `@deprecated` annotation in `vendor/typo3/cms-core/`.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Configuration/
+grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Tests/ Configuration/
 ```
 
 **Method mapping** (`getIndpEnv($name)` → `NormalizedParams` method)
@@ -765,7 +764,7 @@ grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Configuration/
 | `'TYPO3_SITE_URL'` | `getSiteUrl()` |
 | `'TYPO3_SITE_PATH'` | `getSitePath()` |
 
-**Replace -- in controllers/middleware (request injected)**
+#### Replace -- in controllers/middleware (request injected)
 ```php
 // ❌ Before
 $ip = GeneralUtility::getIndpEnv('REMOTE_ADDR');
@@ -774,7 +773,7 @@ $ip = GeneralUtility::getIndpEnv('REMOTE_ADDR');
 $ip = $request->getAttribute('normalizedParams')?->getRemoteAddress() ?? '';
 ```
 
-**Replace -- in services/auth services (no request injected)**
+#### Replace -- in services/auth services (no request injected)
 
 For services where `ServerRequestInterface` cannot be injected (e.g. `AbstractAuthenticationService` subclasses, CLI commands), fall back through `$GLOBALS['TYPO3_REQUEST']` and finally re-create `NormalizedParams` from `$_SERVER`:
 
@@ -805,7 +804,7 @@ private function getRemoteAddress(): string
 }
 ```
 
-**Dual-version compatibility (v12.4 + v13.4 + v14.3)**
+#### Dual-version compatibility (v12.4 + v13.4 + v14.3)
 
 The migration is safe across the entire supported range with **no compatibility shims**: `NormalizedParams` has been part of TYPO3 since v9.4, and `normalizedParams` has been a request attribute since v10. Just migrate to `NormalizedParams` in one step -- it works on v12.4 / v13.4 / v14.3 unchanged, and silences the v14.3 deprecation.
 
@@ -827,13 +826,13 @@ These changes are required for PHP 8.4 compatibility regardless of TYPO3 version
 
 PHP 8.4 deprecates implicit nullable parameters. This affects all TYPO3 versions.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 # Find parameters with null default but no explicit nullable type
-grep -rn '\(.*\$[a-zA-Z_]* = null\)' Classes/ | grep -v '?[a-zA-Z_\\]*\s*\$'
+grep -rn '\(.*\$[a-zA-Z_]* = null\)' Classes/ Tests/ | grep -v '?[a-zA-Z_\\]*\s*\$'
 ```
 
-**Replace**
+#### Replace
 ```php
 // ❌ Deprecated in PHP 8.4 (E_DEPRECATED), Error in PHP 9.0
 public function foo(string $param = null): void
@@ -844,7 +843,7 @@ public function foo(?string $param = null): void
 public function bar(?array $config = null): void
 ```
 
-**Common Occurrences**
+#### Common Occurrences
 - FlexForm configuration parameters
 - Optional service dependencies in constructors
 - Default TCA configuration arrays
@@ -854,12 +853,12 @@ public function bar(?array $config = null): void
 
 ### TCA Items Array Format
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "'items'\s*=>\s*\[" Configuration/TCA/ | grep -v "label"
 ```
 
-**Replace**
+#### Replace
 ```php
 // ❌ Old format (deprecated)
 'items' => [
@@ -882,12 +881,12 @@ grep -rn "'items'\s*=>\s*\[" Configuration/TCA/ | grep -v "label"
 
 When migrating context matching or middleware that needs request data:
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "\$_GET\['\|\$_POST\['" Classes/
+grep -rn "\$_GET\['\|\$_POST\['" Classes/ Tests/
 ```
 
-**Replace Pattern**
+#### Replace Pattern
 ```php
 // ❌ Old pattern - doesn't work with PSR-7 request flow
 $value = $_GET['param'] ?? null;
@@ -945,7 +944,7 @@ public function process(
 
 SC_OPTIONS hooks for page visibility may not work correctly in TYPO3 v12+.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
 grep -rn "SC_OPTIONS\['t3lib/class.t3lib_page.php'\]" ext_localconf.php
 grep -rn "additionalQueryRestrictions" ext_localconf.php
@@ -1013,40 +1012,40 @@ Legend: ✅ Supported | ⚠️ Deprecated | ❌ Removed
 
 ```bash
 # v7→v8: Old database API
-grep -rn "TYPO3_DB\|exec_SELECTquery" Classes/
+grep -rn "TYPO3_DB\|exec_SELECTquery" Classes/ Tests/
 
 # v8→v9: Old routing
 grep -rn "tx_realurl\|cooluri\|sys_domain"
 
 # v9→v10: Signal/Slot
-grep -rn "SignalSlotDispatcher\|->connect\(" Classes/
+grep -rn "SignalSlotDispatcher\|->connect\(" Classes/ Tests/
 
 # v10→v11: Old Fluid
-grep -rn "setTemplatePathAndFilename" Classes/
+grep -rn "setTemplatePathAndFilename" Classes/ Tests/
 
 # v11→v12: PDO constants & deprecated methods
-grep -rn "PDO::PARAM_\|GeneralUtility::_GET\|itemFormElID" Classes/
+grep -rn "PDO::PARAM_\|GeneralUtility::_GET\|itemFormElID" Classes/ Tests/
 
 # v12→v13: TSFE direct access
-grep -rn "\$TSFE->fe_user\|\$TSFE->page\|\$TSFE->rootLine" Classes/
+grep -rn "\$TSFE->fe_user\|\$TSFE->page\|\$TSFE->rootLine" Classes/ Tests/
 
 # v13→v14.3: getIndpEnv() deprecation (use NormalizedParams)
-grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Configuration/
+grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Tests/ Configuration/
 
 # PHP 8.4: Implicit nullable parameters
-grep -rn '\$[a-zA-Z_]* = null)' Classes/ | grep -v '?'
+grep -rn '\$[a-zA-Z_]* = null)' Classes/ Tests/ | grep -v '?'
 
 # PHP 8.4: Old TCA items format
 grep -rn "'items'\s*=>" Configuration/TCA/ | head -20
 
 # PSR-7: Direct superglobal access
-grep -rn "\$_GET\['\|\$_POST\['" Classes/
+grep -rn "\$_GET\['\|\$_POST\['" Classes/ Tests/
 
 # SC_OPTIONS hooks (may need PSR-14 migration)
 grep -rn "SC_OPTIONS" ext_localconf.php
 
 # All versions: Full deprecation scan
-grep -rn "@deprecated\|trigger_error.*E_USER_DEPRECATED" Classes/
+grep -rn "@deprecated\|trigger_error.*E_USER_DEPRECATED" Classes/ Tests/
 ```
 
 ---
@@ -1079,13 +1078,13 @@ When upgrading extensions, tests often need adjustments to work with new TYPO3 v
 
 In TYPO3 v12+, singleton services may persist state between tests. Reset the Container before each test:
 
-**Problem Pattern**
+#### Problem Pattern
 ```php
 // Tests pass individually but fail when run together
 // due to state pollution from singleton services
 ```
 
-**Fix Pattern**
+#### Fix Pattern
 ```php
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -1093,10 +1092,10 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 protected function setUp(): void
 {
     parent::setUp();
-    
+
     // Reset Container to ensure clean state
     GeneralUtility::resetSingletonInstances([]);
-    
+
     // Flush all caches for complete reset
     Bootstrap::initializeBackendRouter();
 }
@@ -1106,7 +1105,7 @@ protected function setUp(): void
 
 When testing features that use session storage (e.g., context matching), disable sessions in fixtures:
 
-**CSV Fixture Pattern**
+#### CSV Fixture Pattern
 ```csv
 # tx_myext_records.csv
 # Set use_session=0 to prevent session state from persisting between tests
@@ -1121,7 +1120,7 @@ When testing features that use session storage (e.g., context matching), disable
 
 When supporting `^12.4 || ^13.4`, PHPUnit configuration may need adjustments:
 
-**Coverage Driver Consideration**
+#### Coverage Driver Consideration
 ```xml
 <!-- Build/phpunit/UnitTests.xml -->
 <phpunit>
@@ -1134,7 +1133,7 @@ When supporting `^12.4 || ^13.4`, PHPUnit configuration may need adjustments:
 </phpunit>
 ```
 
-**CI without Coverage Driver**
+#### CI without Coverage Driver
 ```bash
 # If no coverage driver installed, use --no-coverage flag
 ./vendor/bin/phpunit --no-coverage
@@ -1168,14 +1167,14 @@ fi
 
 Playwright E2E tests may need adjustments for TYPO3 version differences:
 
-**Locator Changes**
+#### Locator Changes
 ```typescript
 // TYPO3 v12 vs v13 may have different CSS selectors
 // Use data-testid attributes for stability
 await page.locator('[data-testid="login-submit"]').click();
 ```
 
-**Timeout Adjustments**
+#### Timeout Adjustments
 ```typescript
 // TYPO3 v13 backend may take longer to initialize
 test.setTimeout(60000); // 60 seconds for complex backend operations
@@ -1250,12 +1249,12 @@ TYPO3 extensions often use Symfony components directly. Be aware of these deprec
 
 The `Symfony\Component\PropertyInfo\Type` class and its constants are deprecated since Symfony 7.3.
 
-**Search Pattern**
+#### Search Pattern
 ```bash
-grep -rn "PropertyInfo\\Type\|Type::BUILTIN_TYPE_" Classes/
+grep -rn "PropertyInfo\\Type\|Type::BUILTIN_TYPE_" Classes/ Tests/
 ```
 
-**Replace**
+#### Replace
 
 | Before (Deprecated) | After |
 |---------------------|-------|
@@ -1269,7 +1268,7 @@ grep -rn "PropertyInfo\\Type\|Type::BUILTIN_TYPE_" Classes/
 | `Type::BUILTIN_TYPE_CALLABLE` | `'callable'` |
 | `Type::BUILTIN_TYPE_ITERABLE` | `'iterable'` |
 
-**Example Migration**
+#### Example Migration
 ```php
 // Before (deprecated since Symfony 7.3)
 use Symfony\Component\PropertyInfo\Type;
@@ -1306,7 +1305,7 @@ $encoder->addType(
 }
 ```
 
-**Common Mistakes**
+#### Common Mistakes
 ```json
 // ❌ BAD: No minimum specified - breaks on older PHP
 {
@@ -1336,7 +1335,7 @@ When supporting PHP 8.2, watch for dependencies that require newer PHP versions:
 | `phpunit/phpunit` | `^12.0` | PHP ≥8.3 |
 | `phpunit/phpunit` | `^11.0` | PHP ≥8.2 |
 
-**Diagnosis Command**
+#### Diagnosis Command
 ```bash
 # Find what prevents a specific PHP version
 composer why-not php:8.2

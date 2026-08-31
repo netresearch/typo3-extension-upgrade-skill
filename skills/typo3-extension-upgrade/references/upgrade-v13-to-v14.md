@@ -96,29 +96,39 @@ $rectorConfig->sets([
 
 All 98 breakers landed in v14.0. **If your extension compiles against v14.0, it's already forward-compatible with 14.1/14.2/14.3.**
 
+**Every search below covers `Tests/` as well as `Classes/`, and that is not tidiness.** A removed class referenced from a test file does not fail one test — PHPUnit resolves the class while *loading* the suite, so the run dies before a single test executes:
+
+```
+An error occurred inside PHPUnit.
+Message:  Class "TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController" not found
+Location: Tests/Unit/Classes/Context/AbstractContextTest.php:38
+```
+
+The extension's `Classes/` was clean, the dependencies resolved, v14.3 installed — and the suite reported a total failure whose cause the prescribed searches could not see, because they looked only in `Classes/`. Measured on an upgrade that got everything else right, four times over two days. The test suite is production code for the purposes of an upgrade.
+
 ### Critical (most-hit)
 
 | Change | Forge | Search | Fix |
 |---|---|---|---|
-| `TypoScriptFrontendController` class removed | #107831 | `grep -rn "TSFE\|TypoScriptFrontendController\|frontend.controller" Classes/` | Use `$request->getAttribute('frontend.page.information')`, `PageRenderer::addHeaderData()` |
+| `TypoScriptFrontendController` class removed | #107831 | `grep -rn "TSFE\|TypoScriptFrontendController\|frontend.controller" Classes/ Tests/` | Use `$request->getAttribute('frontend.page.information')`, `PageRenderer::addHeaderData()` |
 | Fluid 5 strict VH typing | #108148 | `grep -rL "function render.*:" Classes/ViewHelpers/` | Add typed args + `render(): string` |
-| Fluid VH `renderStatic()` removed | #108148 | `grep -rn "renderStatic" Classes/` | Non-static `render()` |
-| Fluid `StandaloneView`, `TemplateView` removed | #105377 | `grep -rn "StandaloneView\|AbstractTemplateView" Classes/` | `Core\View\ViewFactoryInterface` |
+| Fluid VH `renderStatic()` removed | #108148 | `grep -rn "renderStatic" Classes/ Tests/` | Non-static `render()` |
+| Fluid `StandaloneView`, `TemplateView` removed | #105377 | `grep -rn "StandaloneView\|AbstractTemplateView" Classes/ Tests/` | `Core\View\ViewFactoryInterface` |
 | Fluid underscore-prefixed variables forbidden | #108148 | `grep -rEn '\{_[a-zA-Z]' Resources/Private/` | Rename variables |
-| Extbase annotation namespace removed | #107229 | `grep -rn "@Extbase\\\\Annotation" Classes/` | PHP attributes `#[Validate]`, `#[IgnoreValidation]` |
-| Magic repo finders removed | #105377 | `grep -rn "->findBy[A-Z]\|->findOneBy[A-Z]\|->countBy[A-Z]" Classes/` | `createQuery()` builder |
-| `HashService` (Extbase) removed | #105377 | `grep -rn "HashService\|GeneralUtility::hmac(" Classes/` | Core cipher service (#108002) |
+| Extbase annotation namespace removed | #107229 | `grep -rn "@Extbase\\\\Annotation" Classes/ Tests/` | PHP attributes `#[Validate]`, `#[IgnoreValidation]` |
+| Magic repo finders removed | #105377 | `grep -rn "->findBy[A-Z]\|->findOneBy[A-Z]\|->countBy[A-Z]" Classes/ Tests/` | `createQuery()` builder |
+| `HashService` (Extbase) removed | #105377 | `grep -rn "HashService\|GeneralUtility::hmac(" Classes/ Tests/` | Core cipher service (#108002) |
 | TCA `subtype_value_field` / `subtypes_addlist` removed | #105377 | `grep -rn "subtype_value_field\|subtypes_addlist" Configuration/TCA/` | Record-type flex-form handling |
 | TCA `control.searchFields` removed | #106972 | `grep -rn "searchFields" Configuration/TCA/` | Configurable search TCA |
 | TCA `eval=year` removed | #98070 | `grep -rn "'eval'.*year" Configuration/TCA/` | integer field |
 | TCA `pages.url` field removed | #17406 | `grep -rn "pages\\.url" Configuration/TCA/` | typolink page type |
 | `tt_content.list_type` removed | #105538, #105377 | `grep -rn "list_type\|addPlugin" Configuration/` | CType-only plugins; drop 2nd/3rd args of `addPlugin()` |
 | EXT:form hooks removed (10 hooks) | many | `grep -rn "'afterBuildingFinished'\|beforeFormCreate\|beforeFormSave\|beforeFormDelete\|beforeFormDuplicate\|initializeFormElement\|beforeRemoveFromParentRenderable\|afterInitializeCurrentPage\|afterSubmit\|beforeRendering" ext_localconf.php Classes/` | PSR-14 events |
-| `TypolinkBuilder` signature changed | #106405 | `grep -rn "extends AbstractTypolinkBuilder\|TypolinkBuilder" Classes/` | Implement `TypolinkBuilderInterface` |
+| `TypolinkBuilder` signature changed | #106405 | `grep -rn "extends AbstractTypolinkBuilder\|TypolinkBuilder" Classes/ Tests/` | Implement `TypolinkBuilderInterface` |
 | Bootstrap Modal → native `<dialog>` | #107443 | `grep -rn "Modal.advanced\|bootstrap.*modal" Resources/Public/JavaScript/` | Native `<dialog>` API |
-| `MailMessage->send()` removed | #108097 | `grep -rn "->send()" Classes/` (filter for MailMessage) | Dispatch via Mailer service |
+| `MailMessage->send()` removed | #108097 | `grep -rn "->send()" Classes/ Tests/` (filter for MailMessage) | Dispatch via Mailer service |
 | HMAC algorithm SHA1 → SHA256 | #106307 | automatic via Rector | Rotate existing HMACs if persisted |
-| `LoginProviderInterface::render()` → `modifyView()` | internal | `grep -rn "LoginProviderInterface" Classes/` | Implement `modifyView()` |
+| `LoginProviderInterface::render()` → `modifyView()` | internal | `grep -rn "LoginProviderInterface" Classes/ Tests/` | Implement `modifyView()` |
 | `composer.json` required in classic mode | #108310 | check presence in project root | Create `composer.json` with extension autoload |
 | CSS/JS concat & compression removed | #108055 | `grep -rn "concatenateCss\|concatenateJs\|compressCss\|compressJs" Configuration/TypoScript/` | Use build tools (webpack/vite) |
 | Frontend HTTP compression removed | #107943 | check TypoScript `config.compressionLevel` | Delegate to web server (nginx/Apache) |
@@ -130,7 +140,7 @@ These are **not** v14.0 breakers — code keeps working — but you should migra
 
 | Change | Forge / Source | Search | Fix |
 |---|---|---|---|
-| `GeneralUtility::getIndpEnv()` deprecated (v14.3) | `cms-core` v14.3 — `Classes/Utility/GeneralUtility.php` `@deprecated` annotation | `grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Configuration/` | `$request->getAttribute('normalizedParams')->getRemoteAddress()` etc. — see `api-changes.md` |
+| `GeneralUtility::getIndpEnv()` deprecated (v14.3) | `cms-core` v14.3 — `Classes/Utility/GeneralUtility.php` `@deprecated` annotation | `grep -rn "GeneralUtility::getIndpEnv\|::getIndpEnv(" Classes/ Tests/ Configuration/` | `$request->getAttribute('normalizedParams')->getRemoteAddress()` etc. — see `api-changes.md` |
 
 > ⚠️ **AI-assistant warning**: Don't trust Gemini Code Assist on `getIndpEnv()` deprecation timing. It has hallucinated v13.0 deprecation / v14.0 removal, and falsely claimed `NormalizedParams::createFromServerParams()` was removed in v14.0 in favour of a non-existent `NormalizedParamsFactory`. All three claims are wrong — verified false against `typo3/cms-core` v14.3.0 vendor source. Always grep the `@deprecated` annotation in `vendor/typo3/cms-core/` to confirm.
 
@@ -388,7 +398,7 @@ vendor/bin/rector process --dry-run
 vendor/bin/fluid analyze Resources/Private/
 
 # No removed APIs remain
-grep -rnE "HashService|->findBy[A-Z]|GLOBALS\[.TSFE.\]|StandaloneView|renderStatic|subtype_value_field|control\\.searchFields" Classes/ Configuration/
+grep -rnE "HashService|->findBy[A-Z]|GLOBALS\[.TSFE.\]|StandaloneView|renderStatic|subtype_value_field|control\\.searchFields" Classes/ Tests/ Configuration/
 ```
 
 ---
@@ -413,7 +423,7 @@ See also:
 - `api-changes.md` — detailed v13→v14 API migration patterns
 - `third-party-dependency-upgrades.md` — Symfony 7.3 / Doctrine DBAL 4 / Fluid 5 / CKE 47 bump notes
 - `verification.md` — success criteria
-- TYPO3 Core Changelog 14.0–14.3: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html
+- TYPO3 Core Changelog 14.0–14.3: <https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog-14.html>
 
 ## SingletonInterface deprecation (TYPO3 v14)
 

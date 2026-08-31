@@ -27,7 +27,7 @@ services:
 
 **Search Pattern**:
 ```bash
-grep -rn "GeneralUtility::_GET\|GeneralUtility::_POST\|GeneralUtility::_GP" Classes/
+grep -rn "GeneralUtility::_GET\|GeneralUtility::_POST\|GeneralUtility::_GP" Classes/ Tests/
 ```
 
 **v11 Pattern**:
@@ -48,7 +48,7 @@ $value = $request->getQueryParams()['tx_myext'] ?? null;
 
 **Search Pattern**:
 ```bash
-grep -rn "\$GLOBALS\['TSFE'\]" Classes/
+grep -rn "\$GLOBALS\['TSFE'\]" Classes/ Tests/
 ```
 
 **v11 Pattern**:
@@ -72,7 +72,7 @@ $pageId = $pageInfo?->getId() ?? 0;
 
 **Search Pattern**:
 ```bash
-grep -rn "createNamedParameter" Classes/
+grep -rn "createNamedParameter" Classes/ Tests/
 ```
 
 **v11 (DBAL 3.x)**:
@@ -88,6 +88,7 @@ $queryBuilder->createNamedParameter($value, Connection::PARAM_INT);
 ```
 
 **Available Constants**:
+
 | PDO Constant | DBAL Constant |
 |--------------|---------------|
 | `PDO::PARAM_INT` | `Connection::PARAM_INT` |
@@ -99,7 +100,7 @@ $queryBuilder->createNamedParameter($value, Connection::PARAM_INT);
 
 **Search Pattern**:
 ```bash
-grep -rn "itemFormElID" Classes/
+grep -rn "itemFormElID" Classes/ Tests/
 ```
 
 **v11 Pattern**:
