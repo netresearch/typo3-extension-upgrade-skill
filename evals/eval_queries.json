@@ -1,0 +1,47 @@
+{
+  "skill_name": "typo3-extension-upgrade",
+  "note": "Trigger evals in the format agentskills.io documents: realistic requests, labelled with whether this skill should be consulted. They test ROUTING, which the assertion evals in evals.json cannot: those are graded by matching the answer text, so they only ever measure what the skill does once it is already loaded. Prompts are written in the words a maintainer or a colleague would use, not in the skill's own, and never copied from a benchmark that measures this skill. The negatives matter as much as the positives here: this skill and typo3-conformance both answer to 'TYPO3' and 'extension', and a request that names neither an upgrade nor a target version has been observed going to whichever of them the model reached for first.",
+  "queries": [
+    {
+      "query": "Our extension should run on whichever TYPO3 LTS is current now — please sort that out.",
+      "should_trigger": true,
+      "note": "names no version, no tool and not the word upgrade — the shape that lost to a sibling skill until the description opened with it"
+    },
+    {
+      "query": "Does this still run on v14, and if not, what has to change?",
+      "should_trigger": true
+    },
+    {
+      "query": "We are still on 12.4 and want to go to 13.4. What breaks?",
+      "should_trigger": true
+    },
+    {
+      "query": "After the version bump the tests do not even start any more.",
+      "should_trigger": true,
+      "note": "a removed class referenced from Tests/ stops PHPUnit while loading the suite"
+    },
+    {
+      "query": "This has to keep working on the old LTS while we get it ready for the new one.",
+      "should_trigger": true
+    },
+    {
+      "query": "The extension scanner reports a couple of dozen deprecations. Where do I start?",
+      "should_trigger": true
+    },
+    {
+      "query": "Which TYPO3 versions does this extension say it supports? composer.json and ext_emconf.php disagree.",
+      "should_trigger": false,
+      "note": "typo3-conformance owns what an extension declares; nothing here is being upgraded"
+    },
+    {
+      "query": "Give this extension a once-over before I hand it on — what stands out?",
+      "should_trigger": false,
+      "note": "an open review, not a target version — typo3-conformance"
+    },
+    {
+      "query": "Saving a record in one of our backend modules silently keeps the previous value. Find out why.",
+      "should_trigger": false,
+      "note": "a runtime defect, unrelated to any version"
+    }
+  ]
+}

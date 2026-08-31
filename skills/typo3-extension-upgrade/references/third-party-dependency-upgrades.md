@@ -45,7 +45,7 @@ Search your extension's PHP code (e.g., `Classes/`, `Tests/`, `Configuration/`, 
 grep -rn "use Vendor\\Package\\" Classes/ Tests/ Configuration/ Resources/
 
 # Find all method calls on objects of that type
-grep -rn "->methodName(" Classes/ Tests/ Configuration/ Resources/
+grep -rne "->methodName(" Classes/ Tests/ Configuration/ Resources/
 
 # Find all static calls
 grep -rn "Vendor\\Package\\ClassName::" Classes/ Tests/ Configuration/ Resources/

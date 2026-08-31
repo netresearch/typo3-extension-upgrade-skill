@@ -10,10 +10,10 @@ Architectural rules and silent footguns that bite across TYPO3 v12, v13, and v14
 
 This bites hardest in admin tooling, cleanup scripts, and audit features that explicitly want to see deleted records.
 
-**Search Pattern**
+### Search Pattern
 
 ```bash
-grep -rn "->select(\|Connection::select" Classes/
+grep -rne "->select(\|Connection::select" Classes/ Tests/
 ```
 
 **Fix** — drop down to `QueryBuilder` and remove restrictions explicitly:
@@ -83,10 +83,10 @@ Mental model: `ext_localconf.php` is for "configure the framework" (DI, caches, 
 
 `GeneralUtility::callUserFunction()` instantiates the target class via `makeInstance()` **without DI**, calling the constructor with no arguments. Any class used as a userFunc target (TypoScript `userFunc`, TCA `displayCond`, custom hooks routed through callUserFunction, user-settings panels, etc.) **cannot use constructor injection** — you'll get a `TypeError: too few arguments`.
 
-**Search Pattern**
+### Search Pattern
 
 ```bash
-grep -rn "callUserFunction\|userFunc\s*=" Classes/ Configuration/
+grep -rn "callUserFunction\|userFunc\s*=" Classes/ Tests/ Configuration/
 ```
 
 **Fix options** (in order of preference):
