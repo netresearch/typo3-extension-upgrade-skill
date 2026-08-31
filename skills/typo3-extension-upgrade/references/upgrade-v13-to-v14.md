@@ -138,8 +138,10 @@ table for those and for everything else, one row at a time rather than merged.
 #### When the hit is inside a type declaration
 
 A removed class in a property, parameter or return type cannot be replaced by
-`object`. PHP rejects a union that mixes `object` with a class type, at compile
-time, for the whole file:
+`object` **while another class type stays in the same union**. PHP rejects a
+union that mixes `object` with a class type, at compile time, for the whole
+file. Alone, `object` and `object|null` are perfectly valid — it is the
+combination that is refused:
 
 ```
 Fatal error: Type FrontendUserAuthentication|object|null contains both object
@@ -152,13 +154,18 @@ symptom as before the fix, one cause further on. Write the replacement type,
 or drop the declaration entirely and keep the docblock:
 
 ```php
-// Wrong: object beside a class type
+use Psr\Http\Message\ServerRequestInterface;
+
+// Wrong: object beside a class type that stayed
 private FrontendUserAuthentication|object|null $context = null;
 
-// Either name the type that replaced it
+// Fine, if nothing else remains in the union
+private ?object $context = null;
+
+// Better: name the type that replaced it
 private ?ServerRequestInterface $request = null;
 
-// or leave it untyped and say so in the docblock
+// Or leave it untyped and say so in the docblock
 /** @var mixed the v13 context object, gone in v14 */
 private $context = null;
 ```
