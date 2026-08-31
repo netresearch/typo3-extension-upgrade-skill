@@ -8,6 +8,23 @@
 
 ## Version constraints
 
+> **The LTS minor is `.3`, not `.4`. There is no `^14.4`.**
+>
+> v11.5, v12.4 and v13.4 made the last minor of each major the LTS, so the next
+> one in the rhythm looks like `14.4`. It does not exist: v14's LTS is
+> **14.3**, released 2026-04-21, and the newest v14 release is 14.3.6.
+> `^14.4` matches nothing, so `composer update` fails with
+>
+> ```
+> Root composer.json requires typo3/cms-backend ^12.4 || ^13.4 || ^14.4,
+> found typo3/cms-backend[v12.4.0, ..., v13.4.34] but it conflicts with your
+> temporary update constraint
+> ```
+>
+> Measured: of six upgrade runs, the four that guessed the constraint wrote
+> `^12.4 || ^13.4 || ^14.4` and never installed anything; the two that used the
+> form below wrote `^13.4 || ^14.3` and resolved v14.3.6.
+
 ### composer.json (v14-only)
 
 ```json
