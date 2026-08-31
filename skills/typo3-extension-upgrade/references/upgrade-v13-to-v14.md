@@ -108,6 +108,27 @@ The extension's `Classes/` was clean, the dependencies resolved, v14.3 installed
 
 The rows that search `Configuration/`, `Resources/Private/` or a single subdirectory of `Classes/` are unchanged: a Fluid template or a TCA file has no counterpart under `Tests/`.
 
+### Run this first: every removed class, in one search
+
+The table below has one search per row, and a row's search often lists several
+alternatives. Merging those rows into one pattern is the natural thing to do
+and it loses terms: measured, an agent turned
+`"TSFE\|TypoScriptFrontendController\|frontend.controller"` into
+`GLOBALS\[.TSFE.\]`, kept the `$GLOBALS` spelling, dropped the class name, and
+so never saw the reference in `Tests/` that stopped its whole suite from
+loading.
+
+A removed **class name** is the one term that must not be lost, because a
+single reference to one — anywhere, `Tests/` included — is a fatal error rather
+than a failing assertion. So search for all of them at once, before the table:
+
+```bash
+grep -rnE 'TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface|FileNameValidator|CacheHashCalculator' Classes/ Tests/
+```
+
+Every hit is a fix, not a candidate. Then work the table for the rest, one row
+at a time rather than merged.
+
 ### Critical (most-hit)
 
 | Change | Forge | Search | Fix |
