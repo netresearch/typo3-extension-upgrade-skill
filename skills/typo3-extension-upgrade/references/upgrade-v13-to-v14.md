@@ -135,6 +135,41 @@ argument and some public methods — so a match on either is a question rather
 than a defect, and they are deliberately absent from the search above. Work the
 table for those and for everything else, one row at a time rather than merged.
 
+#### When the hit is inside a type declaration
+
+A removed class in a property, parameter or return type cannot be replaced by
+`object` **while another class type stays in the same union**. PHP rejects a
+union that mixes `object` with a class type, at compile time, for the whole
+file. Alone, `object` and `object|null` are perfectly valid — it is the
+combination that is refused:
+
+```
+Fatal error: Type FrontendUserAuthentication|object|null contains both object
+and a class type, which is redundant
+```
+
+Measured: an agent that had found the reference in a test file and removed the
+class name got exactly this, and the suite still failed to load — the same
+symptom as before the fix, one cause further on. Write the replacement type,
+or drop the declaration entirely and keep the docblock:
+
+```php
+use Psr\Http\Message\ServerRequestInterface;
+
+// Wrong: object beside a class type that stayed
+private FrontendUserAuthentication|object|null $context = null;
+
+// Fine, if nothing else remains in the union
+private ?object $context = null;
+
+// Better: name the type that replaced it
+private ?ServerRequestInterface $request = null;
+
+// Or leave it untyped and say so in the docblock
+/** @var mixed the v13 context object, gone in v14 */
+private $context = null;
+```
+
 ### Critical (most-hit)
 
 | Change | Forge | Search | Fix |
