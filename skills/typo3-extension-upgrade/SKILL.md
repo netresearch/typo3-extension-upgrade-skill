@@ -28,8 +28,25 @@ Extension code only, not project/core upgrades.
 7. Run `php-cs-fixer fix`
 8. Run `phpstan analyse` **against each supported dependency version** and fix errors
 9. Run `phpunit` and fix tests
-10. Test in target TYPO3 version(s)
+10. **Install the target version and run the suite against it.** A green suite
+    on the version already installed proves nothing about the target — that is
+    the old code passing old tests. Install first, then test:
+    `composer update "typo3/*" --with typo3/cms-core:^14.3 -W && vendor/bin/phpunit -c Build/phpunit/UnitTests.xml`
+    The package argument matters: without it `composer update` moves every
+    dependency, and the test result then depends on upgrades that have nothing
+    to do with TYPO3. `-W` lets the TYPO3 packages' own dependencies follow.
 11. Verify success criteria (consult `references/verification.md`)
+
+**Done means the suite passes with the target version installed.** Not that the
+constraint was widened, and not that the suite is green where it was already
+green.
+
+Where a removed class is referenced decides when it bites. In an `import`, a
+parent class, a property or a signature it is resolved while PHPUnit *loads*
+the suite, so nothing runs at all and the failure looks nothing like a test
+failure. Referenced only inside a method body, it fails when that one test
+executes, and the rest of the suite still passes — which is the more
+comfortable failure and the easier one to miss in a summary line.
 
 ## When NOT to Apply Automatically
 
