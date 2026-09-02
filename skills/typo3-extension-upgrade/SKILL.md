@@ -48,6 +48,22 @@ failure. Referenced only inside a method body, it fails when that one test
 executes, and the rest of the suite still passes — which is the more
 comfortable failure and the easier one to miss in a summary line.
 
+## When the migration breaks the tests
+
+It will. Rector applied against a real extension routinely leaves a suite that
+was green sitting on dozens of errors, and the fix is to work through them.
+
+**Never revert the migration to get back to green.** Measured: an agent ran
+Rector, saw `Tests: 719, Errors: 34`, ran `git checkout Classes/`, got
+`OK (719 tests, 1176 assertions)` and committed — composer.json, ext_emconf.php
+and two build files, no code. That commit claims support for a version the code
+does not have, and it is the worst of the three possible outcomes: a failing
+upgrade is visible, an unattempted one is honest, and this one is neither.
+
+Green after a revert is the state you started in. The only green that counts is
+the one from step 10, with the target version installed and the migration in
+place.
+
 ## When NOT to Apply Automatically
 
 Do NOT blindly apply Rector/Fractor when dual-version compatibility, missing
