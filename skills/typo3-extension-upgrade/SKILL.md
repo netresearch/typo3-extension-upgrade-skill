@@ -27,7 +27,14 @@ Extension code only, not project/core upgrades.
 6. Run `fractor process --dry-run` then review and apply
 7. Run `php-cs-fixer fix`
 8. Run `phpstan analyse` **against each supported dependency version** and fix errors
-9. Run `phpunit` and fix tests
+9. Run `phpunit` and fix tests. **`Tests/` is part of the upgrade, not a
+   consequence of it.** A class v14 removed, referenced from a test, is fatal
+   rather than failing: in an import, a parent, a property or a signature it
+   stops PHPUnit while it loads the suite, so nothing runs at all. Search for
+   the removed types across both trees before running anything:
+   `grep -rnE 'TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface' Classes/ Tests/`
+   Every hit is a fix. `createMock` on one of them cannot be repaired by
+   swapping the name — see `references/upgrade-v13-to-v14.md`
 10. **Install the target version and run the suite against it.** A green suite
     on the version already installed proves nothing about the target — that is
     the old code passing old tests. Install first, then test:
