@@ -152,6 +152,36 @@ argument and some public methods — so a match on either is a question rather
 than a defect, and they are deliberately absent from the search above. Work the
 table for those and for everything else, one row at a time rather than merged.
 
+#### When the hit is a mock target
+
+`createMock(RemovedClass::class)` cannot be repaired by replacing a type. There
+is nothing to mock — PHPUnit reflects over the class to build the double, and a
+class that no longer exists fails at that line:
+
+```
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException:
+Class or interface "TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController"
+does not exist
+```
+
+This is the residue after the mechanical fixes, and it is the last thing left
+standing: measured, an upgrade that got everything else right reached 719 tests
+with 3 errors, all of them this. It survives because the search finds it and a
+search-and-replace cannot fix it — the decision is what the test should now
+assert, not which name to substitute.
+
+Two honest answers, and which one applies is a judgement about the test:
+
+- **The behaviour still exists, reached differently.** Mock what replaced the
+  class — for `TypoScriptFrontendController`, the request and its attributes —
+  and assert against that instead.
+- **The behaviour is gone with the class.** Delete the test. A test for a code
+  path that v14 removed is not a regression guard, and keeping it alive by
+  mocking something adjacent is how a suite starts asserting its own scaffolding.
+
+Do not reach for the third answer, which is neither: leaving the test in place
+with the mock target swapped for whatever happens to exist.
+
 #### When the hit is inside a type declaration
 
 A removed class in a property, parameter or return type cannot be replaced by
