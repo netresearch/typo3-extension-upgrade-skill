@@ -22,6 +22,16 @@ Extension code only, not project/core upgrades.
 1. Complete planning phase (consult `references/pre-upgrade.md`)
 2. Create feature branch (verify git is clean)
 3. Update `composer.json` constraints for the target version. **v14's LTS minor is 3: write `^14.3`, never `^14.4`** — `^13.4 || ^14.3` to support both. v11.5, v12.4 and v13.4 make `14.4` look like the next in line; it matches no release, so `composer update` fails dependency resolution, exits non-zero and installs nothing. Constraints for every version pair: `references/upgrade-v13-to-v14.md`
+
+   **Adding a version is not replacing one.** Writing `^14.3` alone drops
+   support for every line the extension had before, which is a breaking change
+   for everyone installing it — and it is the cheap way to make the new line
+   resolve, so it happens by accident. "Make it work with the current LTS"
+   asks for the new line, not for the loss of the old one. Keep both
+   (`^13.4 || ^14.3`) unless dropping one was asked for explicitly, and if you
+   do drop it, say so where a maintainer will see it. Whether one codebase
+   *can* serve both is a separate question, answered in
+   `references/dual-compatibility.md`.
 4. **Audit third-party dependencies** for major version changes (consult `references/third-party-dependency-upgrades.md`)
 5. Run `rector process --dry-run` then review and apply
 6. Run `fractor process --dry-run` then review and apply
