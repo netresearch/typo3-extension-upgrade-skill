@@ -152,6 +152,27 @@ argument and some public methods — so a match on either is a question rather
 than a defect, and they are deliberately absent from the search above. Work the
 table for those and for everything else, one row at a time rather than merged.
 
+#### Removing the import is not removing the usage
+
+Deleting `use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;`
+and leaving `TypoScriptFrontendController::class` in a method body does not
+remove the reference. PHP resolves the unqualified name through the current
+namespace instead, so the code now names a class nobody ever wrote:
+
+```
+Class or interface "Netresearch\Contexts\Tests\Unit\Context\TypoScriptFrontendController"
+does not exist
+```
+
+Measured, and it is worse than it looks: on the target line the class is gone
+either way, so this edit changes nothing there — but on the line the extension
+still has to support, the class *does* exist, and the import was what reached
+it. Removing the import breaks the leg that was working while leaving the
+broken one broken. One trial passed v14.3 and lost v13.4 to exactly this, five
+errors, all of them a mock on a name that resolves nowhere.
+
+Search for the class name, not the import line, and change the usage.
+
 #### When the hit is a mock target
 
 `createMock(RemovedClass::class)` cannot be repaired by replacing a type. There
