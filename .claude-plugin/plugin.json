@@ -1,6 +1,6 @@
 {
   "name": "typo3-extension-upgrade",
-  "version": "3.12.1",
+  "version": "3.12.2",
   "description": "Systematic TYPO3 extension upgrades with planning agents and commands",
   "author": {
     "name": "Netresearch DTT GmbH",
