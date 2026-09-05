@@ -27,11 +27,13 @@ Extension code only, not project/core upgrades.
    support for every line the extension had before, which is a breaking change
    for everyone installing it — and it is the cheap way to make the new line
    resolve, so it happens by accident. "Make it work with the current LTS"
-   asks for the new line, not for the loss of the old one. Keep both
-   (`^13.4 || ^14.3`) unless dropping one was asked for explicitly, and if you
-   do drop it, say so where a maintainer will see it. Whether one codebase
-   *can* serve both is a separate question, answered in
-   `references/dual-compatibility.md`.
+   asks for the new line, not for the loss of the old ones.
+   **Read the existing constraint and keep every line in it**, then add the
+   target: `^12.4 || ^13.4` becomes `^12.4 || ^13.4 || ^14.3`, and only an
+   extension that already supported v13 alone ends up at `^13.4 || ^14.3`.
+   Drop a line only where that was asked for, and say so where a maintainer
+   will see it. Whether one codebase *can* serve them all is a separate
+   question, answered in `references/dual-compatibility.md`.
 4. **Audit third-party dependencies** for major version changes (consult `references/third-party-dependency-upgrades.md`)
 5. Run `rector process --dry-run` then review and apply
 6. Run `fractor process --dry-run` then review and apply
