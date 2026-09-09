@@ -8,6 +8,9 @@ When `composer.json` constraints widen to include a new major version of ANY dep
 - `composer.json` changes from `"vendor/package": "^3.0"` to `"^3.0 || ^4.0"`
 - A dependency releases a new major version with breaking changes
 - Multi-version support is required (e.g., intervention/image v3 + v4)
+- A project-specific fork of a third-party extension is abandoned in favor of real
+  upstream, even on the SAME TYPO3 version — the fork and upstream have diverged
+  enough that swapping is effectively an API-compatibility problem, not a version bump
 
 ## Triage First: Which Majors Are Even Reachable
 
@@ -125,6 +128,45 @@ class ImageProcessorFactory
     }
 }
 ```
+
+#### Synthesizing a Missing Domain Event from a Generic Framework Event
+
+When the OLD version (a fork, or an older major) dispatched a custom domain event
+(e.g. `AfterPostCreateEvent`) that the NEW version dropped or never had, don't try to
+patch the new version's controllers to add it back. Check whether the framework
+itself already fires a generic, version-independent lifecycle event that fires for
+ANY entity of the relevant kind, and synthesize the missing domain event from that
+instead — no changes to the third-party code at all.
+
+For TYPO3 v13 Extbase specifically, `TYPO3\CMS\Extbase\Event\Persistence\EntityAddedToPersistenceEvent`
+fires for every Extbase object being persisted, independent of which extension owns
+the entity:
+
+```php
+final class SynthesizeAfterPostCreateEventListener
+{
+    public function __construct(private readonly EventDispatcherInterface $eventDispatcher) {}
+
+    #[AsEventListener]
+    public function __invoke(EntityAddedToPersistenceEvent $event): void
+    {
+        $object = $event->getObject();
+
+        if (!$object instanceof Post) {
+            return;
+        }
+
+        $this->eventDispatcher->dispatch(new AfterPostCreateEvent($object));
+    }
+}
+```
+
+This keeps the shim entirely in your own adapter code, survives future upstream
+releases (no controller patching to re-apply), and generalizes beyond TYPO3: most
+frameworks with an ORM/persistence layer expose a comparable generic "entity
+persisted" hook (Doctrine's `postPersist`, Symfony's `kernel.view`-adjacent
+lifecycle events) that can serve the same role when a third-party dependency lacks
+a fine-grained domain event you need.
 
 ### Step 5: Version Detection Pitfalls
 
