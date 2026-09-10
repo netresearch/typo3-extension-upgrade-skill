@@ -10,8 +10,8 @@ Extension code only, not project/core upgrades.
 
 **Done is `exit=0` from the step 10 command, run last on every line the
 constraint names that installs, and pasted into the report.** Not a summary.
-Not green on one line with another left red. Not green because tests were
-skipped or deleted. Not a commit with `--no-verify`. Anything short of that is
+Not green on one line with another left red. Not green because failing tests
+were skipped or deleted. Not a commit with `--no-verify`. Anything short of that is
 reported as not done, with the lines that show why.
 
 ## Upgrade Toolkit
@@ -131,12 +131,14 @@ Green after a revert is the state you started in. The only green that counts is
 the one from step 10, with the target version installed and the migration in
 place.
 
-**Skipping or deleting a test to get green is the same revert,** one test at a
-time. A test that exercises an API the new version removed is migrated with the
-code it tests, not marked skipped: `markTestSkipped`, a version check that
-returns early, or a removed test method all turn a failure into silence. The
-same goes for `--no-verify` on the commit — it silences the checks that would
-report it.
+**Skipping or deleting a failing test to get green is the same revert,** one
+test at a time. One skip is legitimate: where the code branches by version, a
+test of the branch that exists only on the older line —
+`if (!class_exists(X::class)) { self::markTestSkipped(...); }` — may skip on
+the newer line, provided the newer line's branch has a test of its own. Any
+other skip, a version check that returns early, or a removed test method turns
+a failure into silence. So does `--no-verify` on the commit: it silences the
+checks that would report it.
 
 **Nor stop to ask whether to proceed.** Measured: an agent installed the
 target, counted the uses of a class the new version removed, ran
