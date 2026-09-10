@@ -82,9 +82,10 @@ Extension code only, not project/core upgrades.
     pasted as it printed** — the `versions` line, PHPUnit's final summary line
     and the `exit=` line. Where there is no summary, paste what stands in its
     place: PHPUnit's `Message:` line when the suite would not load, Composer's
-    error when the install failed. Any `exit=` other than `0` means the work is
-    not done: go back to step 9. Committing past a red suite, or with
-    `--no-verify`, is not done either.
+    error when the install failed. On a line that installed, any `exit=` other
+    than `0` means the work is not done: go back to step 9. A line whose install
+    failed is the untested case from step 11. Committing past a red suite, or
+    with `--no-verify`, is not done either.
 13. Verify success criteria (consult `references/verification.md`)
 
 **Done means the suite passes on every line the constraint names, with that
