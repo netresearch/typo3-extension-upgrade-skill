@@ -74,7 +74,10 @@ Extension code only, not project/core upgrades.
     `--with typo3/cms-core:^13.4` for `^13.4`, and so on. A migration that
     turns the target green can break the line below it: measured, an agent got
     v14 green, left v13's suite failing, and reported all three lines
-    compatible. Fix, then run every line again.
+    compatible. Fix, then run every line again. A line that cannot be
+    installed here at all — Composer cannot resolve or download it — is
+    untested, not failed: report it with Composer's error, and never drop it
+    from the constraint for that reason (step 3).
 12. **Write the report, ending with the output of the last run on each line,
     pasted as it printed** — the `versions` line, PHPUnit's final summary line
     and the `exit=` line. Where there is no summary, paste what stands in its
@@ -85,7 +88,8 @@ Extension code only, not project/core upgrades.
 13. Verify success criteria (consult `references/verification.md`)
 
 **Done means the suite passes on every line the constraint names, with that
-line installed.** Not that the constraint was widened, and not that the suite
+line installed** — every line that can be installed; the rest are reported as
+untested. Not that the constraint was widened, and not that the suite
 is green where it was already green.
 
 The pasted lines are the point of step 12. Measured: agents asked to *prove*
