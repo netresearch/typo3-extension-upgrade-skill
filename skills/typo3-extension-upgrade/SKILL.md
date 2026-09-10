@@ -53,9 +53,12 @@ Extension code only, not project/core upgrades.
     ```bash
     composer update "typo3/*" --with typo3/cms-core:^14.3 -W --no-install \
       && rm -rf vendor && composer install \
-      && vendor/bin/phpunit -c Build/phpunit/UnitTests.xml
+      && composer show typo3/cms-core | grep '^versions' \
+      && vendor/bin/phpunit -c Build/phpunit/UnitTests.xml; echo "exit=$?"
     ```
-    Chained, so a failed install stops before PHPUnit runs against the old tree.
+    Chained, so a failed install stops before PHPUnit runs against the old tree;
+    the `versions` line says what was actually installed, and `exit=` is the
+    status of whichever step ran last.
     One pass fails on the way from v13 to v14: Composer upgrades
     `typo3/class-alias-loader` and then runs the old plugin against the new
     files, which dies with `Class "…\CaseSensitiveToken" not found` after the
@@ -73,15 +76,17 @@ Extension code only, not project/core upgrades.
 constraint was widened, and not that the suite is green where it was already
 green.
 
-**Prove it in the report.** End it with two lines copied from the last run,
-not summarised: the `versions` line of `composer show typo3/cms-core`, and
-PHPUnit's final summary line with its exit status. If that run did not exit 0,
-the work is not done — go back to step 9. Measured: three agents reported
+**Prove it in the report.** End it with lines copied from the last run of the
+step 10 command, not summarised: the `versions` line, PHPUnit's final summary
+line, and the `exit=` line. Where there is no summary, copy what stands in its
+place — PHPUnit's `Message:` line when the suite would not load, Composer's
+error when the install failed. If that run did not print `exit=0`, the work is
+not done — go back to step 9. Measured: three agents reported
 success without such a run. One never installed the target; one tested only
 the version already installed; one ran the suite on the target three times, saw
 it fail to load each time, and still wrote "Done". Copying the lines is what
 makes the gap impossible to miss. Only where you cannot make the suite pass,
-report that, with those same two lines.
+report that, with those same lines.
 
 Where a removed class is referenced decides when it bites. In an `import`, a
 parent class, a property or a signature it is resolved while PHPUnit *loads*
