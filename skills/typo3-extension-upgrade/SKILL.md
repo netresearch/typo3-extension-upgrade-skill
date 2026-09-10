@@ -73,6 +73,16 @@ Extension code only, not project/core upgrades.
 constraint was widened, and not that the suite is green where it was already
 green.
 
+**Prove it in the report.** End it with two lines copied from the last run,
+not summarised: the `versions` line of `composer show typo3/cms-core`, and
+PHPUnit's final summary line with its exit status. If that run did not exit 0,
+the work is not done — go back to step 9. Measured: three agents reported
+success without such a run. One never installed the target; one tested only
+the version already installed; one ran the suite on the target three times, saw
+it fail to load each time, and still wrote "Done". Copying the lines is what
+makes the gap impossible to miss. Only where you cannot make the suite pass,
+report that, with those same two lines.
+
 Where a removed class is referenced decides when it bites. In an `import`, a
 parent class, a property or a signature it is resolved while PHPUnit *loads*
 the suite, so nothing runs at all and the failure looks nothing like a test
@@ -96,6 +106,14 @@ is honest, and this one is neither.
 Green after a revert is the state you started in. The only green that counts is
 the one from step 10, with the target version installed and the migration in
 place.
+
+**Nor stop to ask whether to proceed.** Measured: an agent installed the
+target, counted the uses of a class the new version removed, ran
+`git reset --hard`, and asked whether it should do the refactoring. A request
+to make the extension work with the new version is that permission. Replacing
+what the new version removed *is* the upgrade, however many places use it — it
+is the work, not a finding to report back. Ask only about what the request
+leaves open, such as dropping a supported line (step 3).
 
 ## When NOT to Apply Automatically
 
