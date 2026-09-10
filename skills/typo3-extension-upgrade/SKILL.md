@@ -70,23 +70,31 @@ Extension code only, not project/core upgrades.
     **If the target will not install, the upgrade is untested.** Say so in the
     report, with the error, and do not report the suite as passing: a green run
     on the version that was already there is that version's result.
-11. Verify success criteria (consult `references/verification.md`)
+11. **Run the same command for every older line the constraint keeps** —
+    `--with typo3/cms-core:^13.4` for `^13.4`, and so on. A migration that
+    turns the target green can break the line below it: measured, an agent got
+    v14 green, left v13's suite failing, and reported all three lines
+    compatible. Fix, then run every line again.
+12. **Write the report, ending with the output of the last run on each line,
+    pasted as it printed** — the `versions` line, PHPUnit's final summary line
+    and the `exit=` line. Where there is no summary, paste what stands in its
+    place: PHPUnit's `Message:` line when the suite would not load, Composer's
+    error when the install failed. Any `exit=` other than `0` means the work is
+    not done: go back to step 9. Committing past a red suite, or with
+    `--no-verify`, is not done either.
+13. Verify success criteria (consult `references/verification.md`)
 
-**Done means the suite passes with the target version installed.** Not that the
-constraint was widened, and not that the suite is green where it was already
-green.
+**Done means the suite passes on every line the constraint names, with that
+line installed.** Not that the constraint was widened, and not that the suite
+is green where it was already green.
 
-**Prove it in the report.** End it with lines copied from the last run of the
-step 10 command, not summarised: the `versions` line, PHPUnit's final summary
-line, and the `exit=` line. Where there is no summary, copy what stands in its
-place — PHPUnit's `Message:` line when the suite would not load, Composer's
-error when the install failed. If that run did not print `exit=0`, the work is
-not done — go back to step 9. Measured: three agents reported
-success without such a run. One never installed the target; one tested only
-the version already installed; one ran the suite on the target three times, saw
-it fail to load each time, and still wrote "Done". Copying the lines is what
-makes the gap impossible to miss. Only where you cannot make the suite pass,
-report that, with those same lines.
+The pasted lines are the point of step 12. Measured: agents asked to *prove*
+the result wrote "✅ 719 tests pass" instead, and among those who summarised,
+one had never installed the target, one had seen the suite fail to load three
+times, and one had seen three errors and thirteen failures and committed with
+`--no-verify`. A
+summary can say anything; a pasted `exit=1` cannot. Only where you cannot make
+the suite pass, report that, with those same lines.
 
 Where a removed class is referenced decides when it bites. In an `import`, a
 parent class, a property or a signature it is resolved while PHPUnit *loads*
