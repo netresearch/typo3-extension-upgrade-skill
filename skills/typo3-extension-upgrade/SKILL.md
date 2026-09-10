@@ -51,10 +51,11 @@ Extension code only, not project/core upgrades.
     on the version already installed proves nothing about the target — that is
     the old code passing old tests. Install first, in two passes, then test:
     ```bash
-    composer update "typo3/*" --with typo3/cms-core:^14.3 -W --no-install
-    rm -rf vendor && composer install
-    vendor/bin/phpunit -c Build/phpunit/UnitTests.xml
+    composer update "typo3/*" --with typo3/cms-core:^14.3 -W --no-install \
+      && rm -rf vendor && composer install \
+      && vendor/bin/phpunit -c Build/phpunit/UnitTests.xml
     ```
+    Chained, so a failed install stops before PHPUnit runs against the old tree.
     One pass fails on the way from v13 to v14: Composer upgrades
     `typo3/class-alias-loader` and then runs the old plugin against the new
     files, which dies with `Class "…\CaseSensitiveToken" not found` after the
