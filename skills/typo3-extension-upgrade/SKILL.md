@@ -9,8 +9,8 @@ Framework for upgrading TYPO3 extensions to newer LTS versions.
 Extension code only, not project/core upgrades.
 
 **Done is `exit=0` from the step 10 command, run last on every line the
-constraint names that installs, and pasted into the report.** Not a summary.
-Not green on one line with another left red. Not green because failing tests
+constraint names that installs — read from the run, not assumed.** Not green on
+one line with another left red. Not green because failing tests
 were skipped or deleted. Not a commit with `--no-verify`. Anything short of that is
 reported as not done, with the lines that show why.
 
@@ -91,14 +91,13 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
     installed here at all — Composer cannot resolve or download it — is
     untested, not failed: report it with Composer's error, and never drop it
     from the constraint for that reason (step 3).
-12. **Write the report, ending with the output of the last run on each line,
-    pasted as it printed** — the `versions` line, PHPUnit's final summary line
-    and the `exit=` line. Where there is no summary, paste what stands in its
-    place: PHPUnit's `Message:` line when the suite would not load, Composer's
-    error when the install failed. On a line that installed, any `exit=` other
-    than `0` means the work is not done: go back to step 9. A line whose install
-    failed is the untested case from step 11. Committing past a red suite, or
-    with `--no-verify`, is not done either.
+12. **Before reporting, read the `exit=` line of the last run on each line.** On a
+    line that installed, anything other than `exit=0` means the work is not
+    done: go back to step 9. A line whose install failed is the untested case
+    from step 11. Committing past a red suite, or with `--no-verify`, is not
+    done either. The report says, per line, what was installed and whether the
+    suite passed — and where it did not, the failure as PHPUnit or Composer
+    printed it.
 13. Verify success criteria (consult `references/verification.md`)
 
 **Done means the suite passes on every line the constraint names, with that
@@ -106,13 +105,11 @@ line installed** — every line that can be installed; the rest are reported as
 untested. Not that the constraint was widened, and not that the suite
 is green where it was already green.
 
-The pasted lines are the point of step 12. Measured: agents asked to *prove*
-the result wrote "✅ 719 tests pass" instead, and among those who summarised,
-one had never installed the target, one had seen the suite fail to load three
-times, and one had seen three errors and thirteen failures and committed with
-`--no-verify`. A
-summary can say anything; a pasted `exit=1` cannot. Only where you cannot make
-the suite pass, report that, with those same lines.
+Measured: agents reported "✅ 719 tests pass" having never installed the target,
+having seen the suite fail to load three times, or having seen three errors and
+thirteen failures and committed with `--no-verify`. The run's own `exit=` line
+is what tells you which of those you are in; read it before you write the
+report.
 
 Where a removed class is referenced decides when it bites. In an `import`, a
 parent class, a property or a signature it is resolved while PHPUnit *loads*
