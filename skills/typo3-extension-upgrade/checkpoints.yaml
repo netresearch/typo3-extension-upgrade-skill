@@ -8,6 +8,14 @@
 version: 1
 skill_id: typo3-extension-upgrade
 
+# Only run for TYPO3 extensions (SKILL.md: "Extension code only, not
+# project/core upgrades"). Without this gate /assess ran every check against a
+# Python repository and reported failures that were not about that repository.
+preconditions:
+  - type: json_path
+    target: composer.json
+    pattern: '.type == "typo3-cms-extension"'
+
 mechanical:
   # === RECTOR CONFIGURATION ===
   # Accept both root and Build/ subdirectory layouts (common in extensions that
