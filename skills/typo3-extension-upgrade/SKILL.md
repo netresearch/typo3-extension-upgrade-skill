@@ -14,6 +14,13 @@ Not green on one line with another left red. Not green because failing tests
 were skipped or deleted. Not a commit with `--no-verify`. Anything short of that is
 reported as not done, with the lines that show why.
 
+**A commit hook that fails is a check the repository requires, not an obstacle.**
+Read which command it ran, run that command yourself, fix what it reports, and
+commit again: code style is usually fixed by the repository's own fixer
+(`php-cs-fixer fix` with its config), PHPStan findings are fixed in the code.
+Measured: three agents with both TYPO3 lines green bypassed the style or PHPStan
+hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
+
 ## Upgrade Toolkit
 
 | Tool | Purpose | Files |
