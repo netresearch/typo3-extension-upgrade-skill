@@ -243,10 +243,10 @@ grep -rn "ErrorController::class" Classes/
 ### Affected
 
 Any Extbase controller action that asks `ErrorController` for a response, in
-all versions since v10. On extensions.typo3.org one
-controller had the throwing form and another the discarding form in the same
-class, so `/extension/` without a key answered 200 with "No public version of
-this extension available." while `/package/` correctly answered 404.
+all versions since v10. On extensions.typo3.org one controller had the throwing
+form and another the discarding form in the same class, so `/extension/`
+without a key answered 200 with "No public version of this extension
+available." while `/package/` correctly answered 404.
 
 ## See Also
 
