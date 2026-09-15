@@ -236,12 +236,14 @@ carries on and renders its template.
 ```bash
 # every ErrorController use in an Extbase action
 grep -rn "ErrorController::class" Classes/
-# each hit must be followed by `throw new PropagateResponseException`
+# then read each enclosing action: the response must reach
+# `throw new PropagateResponseException(...)`, which need not be the next line
 ```
 
 ### Affected
 
-Any controller action, all versions since v10. On extensions.typo3.org one
+Any Extbase controller action that asks `ErrorController` for a response, in
+all versions since v10. On extensions.typo3.org one
 controller had the throwing form and another the discarding form in the same
 class, so `/extension/` without a key answered 200 with "No public version of
 this extension available." while `/package/` correctly answered 404.

@@ -283,8 +283,8 @@ instead of the plugin, with no log entry.
 
 Search beyond the extension being upgraded: the reference is often in a
 sitepackage or a sibling extension, not next to the registration. On
-extensions.typo3.org a page type did this for six weeks before anyone
-looked (2026-04 to 2026-09).
+extensions.typo3.org a page type did this for five months, from the CType
+migration on 2026-04-01 until someone read the response on 2026-09-14.
 | Extbase `ActionController->view` typed | #105377 | — | Type-check any custom controller overrides |
 
 ### v14.x deprecations (still callable, removed in v15.0)
