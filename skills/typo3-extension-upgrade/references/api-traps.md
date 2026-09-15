@@ -212,6 +212,40 @@ new AjaxRequest(actionUrl).withQueryArguments({ target: identifier }).get();
 
 ---
 
+## An `ErrorController` Response Must Be Thrown, Not Returned
+
+An Extbase action that asks `ErrorController` for a 404 and then returns or
+discards the response answers **HTTP 200 with the normal page**. The status
+only reaches the client when the response is thrown:
+
+```php
+$response = GeneralUtility::makeInstance(ErrorController::class)
+    ->pageNotFoundAction($request, 'Not found', ['code' => PageAccessFailureReasons::INVALID_PAGE_ARGUMENTS]);
+throw new PropagateResponseException($response, 1234567890);
+```
+
+`PropagateResponseException` extends `ImmediateResponseException`, which the
+content object exception handler rethrows before it renders anything
+(`ProductionExceptionHandler::handle()`), and which the `ResponsePropagation`
+middleware turns back into the response. Returning it instead hands a response
+object to a caller that discards it; discarding it outright means the action
+carries on and renders its template.
+
+### Search Pattern
+
+```bash
+# every ErrorController use in an Extbase action
+grep -rn "ErrorController::class" Classes/
+# each hit must be followed by `throw new PropagateResponseException`
+```
+
+### Affected
+
+Any controller action, all versions since v10. On extensions.typo3.org one
+controller had the throwing form and another the discarding form in the same
+class, so `/extension/` without a key answered 200 with "No public version of
+this extension available." while `/package/` correctly answered 404.
+
 ## See Also
 
 - `upgrade-v11-to-v12.md` — v12 FormEngine DI nodes (`setData()` workaround for [#100670](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.4/Deprecation-100670-DIAwareFormEngineNodes.html))
