@@ -248,6 +248,8 @@ form and another the discarding form in the same class, so `/extension/`
 without a key answered 200 with "No public version of this extension
 available." while `/package/` correctly answered 404.
 
+---
+
 ## See Also
 
 - `upgrade-v11-to-v12.md` — v12 FormEngine DI nodes (`setData()` workaround for [#100670](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.4/Deprecation-100670-DIAwareFormEngineNodes.html))

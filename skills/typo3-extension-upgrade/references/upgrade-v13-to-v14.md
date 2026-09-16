@@ -266,6 +266,7 @@ private $context = null;
 | `composer.json` required in classic mode | #108310 | check presence in project root | Create `composer.json` with extension autoload |
 | CSS/JS concat & compression removed | #108055 | `grep -rn "concatenateCss\|concatenateJs\|compressCss\|compressJs" Configuration/TypoScript/` | Use build tools (webpack/vite) |
 | Frontend HTTP compression removed | #107943 | check TypoScript `config.compressionLevel` | Delegate to web server (nginx/Apache) |
+| Extbase `ActionController->view` typed | #105377 | — | Type-check any custom controller overrides |
 
 ### A CType migration orphans TypoScript references, silently
 
@@ -285,7 +286,6 @@ Search beyond the extension being upgraded: the reference is often in a
 sitepackage or a sibling extension, not next to the registration. On
 extensions.typo3.org a page type did this for five months, from the CType
 migration on 2026-04-01 until someone read the response on 2026-09-14.
-| Extbase `ActionController->view` typed | #105377 | — | Type-check any custom controller overrides |
 
 ### v14.x deprecations (still callable, removed in v15.0)
 
