@@ -8,6 +8,9 @@ When `composer.json` constraints widen to include a new major version of ANY dep
 - `composer.json` changes from `"vendor/package": "^3.0"` to `"^3.0 || ^4.0"`
 - A dependency releases a new major version with breaking changes
 - Multi-version support is required (e.g., intervention/image v3 + v4)
+- A project-specific fork of a third-party extension is abandoned in favor of real
+  upstream, even on the SAME TYPO3 version — the fork and upstream have diverged
+  enough that swapping is effectively an API-compatibility problem, not a version bump
 
 ## Triage First: Which Majors Are Even Reachable
 
@@ -125,6 +128,63 @@ class ImageProcessorFactory
     }
 }
 ```
+
+#### Synthesizing a Missing Domain Event from a Generic Framework Event
+
+When the OLD version (a fork, or an older major) dispatched a custom domain event
+(e.g. `AfterPostCreateEvent`) that the NEW version dropped or never had, don't try to
+patch the new version's controllers to add it back. Check whether the framework
+itself already fires a generic, version-independent lifecycle event that fires for
+ANY entity of the relevant kind, and synthesize the missing domain event from that
+instead — no changes to the third-party code at all.
+
+For TYPO3 Extbase, `TYPO3\CMS\Extbase\Event\Persistence\EntityAddedToPersistenceEvent`
+(present in v12, v13 and v14) fires for every Extbase domain object the persistence
+backend inserts, independent of which extension owns the entity. It is dispatched
+after the new UID has been written back onto the object, so the listener sees a
+complete entity:
+
+```php
+final class SynthesizeAfterPostCreateEventListener
+{
+    public function __construct(private readonly EventDispatcherInterface $eventDispatcher) {}
+
+    #[AsEventListener]
+    public function __invoke(EntityAddedToPersistenceEvent $event): void
+    {
+        $object = $event->getObject();
+
+        if (!$object instanceof Post) {
+            return;
+        }
+
+        $this->eventDispatcher->dispatch(new AfterPostCreateEvent($object));
+    }
+}
+```
+
+The `#[AsEventListener]` attribute exists from v13 on; on v12 register the same class
+in `Configuration/Services.yaml` with the `event.listener` tag.
+
+Know the scope you are buying — the synthesized event is not a drop-in equal of the
+event the fork dispatched, and it differs in both directions:
+
+- **Broader**: it fires for every Extbase `add()` of a `Post` — any controller action,
+  backend module or CLI command that goes through the repository — not only the one
+  action the fork dispatched from. Narrow it inside the listener if the consumer is
+  not idempotent.
+- **Narrower**: records written through DataHandler (TYPO3 backend forms, most
+  importers) never pass the Extbase persistence backend and fire no Extbase event at
+  all.
+- **Insert only**: use `EntityUpdatedInPersistenceEvent` for updates, and
+  `EntityFinalizedAfterPersistenceEvent` where the listener needs the reference index
+  already written.
+
+This keeps the shim entirely in your own adapter code and survives future upstream
+releases (no controller patching to re-apply). The technique generalizes beyond
+TYPO3: an ORM that exposes a generic "entity persisted" hook — Doctrine's
+`postPersist`, for instance — serves the same role when a third-party dependency
+lacks the fine-grained domain event you need.
 
 ### Step 5: Version Detection Pitfalls
 
