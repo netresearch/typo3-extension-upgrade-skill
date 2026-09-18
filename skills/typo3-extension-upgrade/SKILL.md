@@ -71,11 +71,15 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
    the skill loader printed for this skill; the runner lives in the sibling
    skill `automated-assessment`, installed beside it:
    ```bash
+   # from the extension root: every target in the file resolves against it
    "$SKILL_DIR/../automated-assessment/scripts/run-checkpoints.sh" --force \
      "$SKILL_DIR/checkpoints.yaml" . | tail -n 20
    ```
-   Each `fail` line names the file and the rule. Fix every `error` before
-   step 10; a `warning` is a finding for the report. Measured: across twelve
+   Each result line carries the checkpoint id and its description; for a
+   `script` check the evidence says only whether it failed, not where, so on a
+   `TU-58` fail re-run the grep above — the file it lists without a `use`
+   line for the type is the one. Fix every `error` before step 10; a
+   `warning` is a finding for the report. Measured: across twelve
    trials with these checks installed, none ran them, and the one failure
    they would have caught went to the test suite instead.
 10. **Install the target version and run the suite against it.** A green suite
