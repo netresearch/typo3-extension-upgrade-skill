@@ -58,8 +58,12 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
    stops PHPUnit while it loads the suite, so nothing runs at all. Search for
    the removed types across both trees before running anything:
    `grep -rnE 'TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface' Classes/ Tests/`
-   Every hit is a fix. `createMock` on one of them cannot be repaired by
-   swapping the name — see `references/upgrade-v13-to-v14.md`
+   Every hit is a fix, and deleting the `use` line is not one: without the
+   import, `Foo::class` resolves through the *current* namespace, so the file
+   names a class nobody ever wrote and the error surfaces later, on the line
+   that still has to support the old version. Change the usage, not the
+   import. `createMock` on a removed class cannot be repaired by swapping the
+   name either — see `references/upgrade-v13-to-v14.md`
 10. **Install the target version and run the suite against it.** A green suite
     on the version already installed proves nothing about the target — that is
     the old code passing old tests. Install first, in two passes, then test:

@@ -431,5 +431,26 @@
         "description": "Mentions excluding incompatible version combinations"
       }
     ]
+  },
+  {
+    "name": "v14-import-removed-usage-left",
+    "prompt": "I am sliding a TYPO3 extension's supported window from ^12.4 || ^13.4 to ^13.4 || ^14.3. A unit test imported TypoScriptFrontendController and calls createMock(TypoScriptFrontendController::class) five times. v14 removed that class, so I deleted the use statement. The 14.3 leg is green now, but the 13.4 leg fails with five errors saying the class does not exist, and the name in the error is my own test namespace. What happened, and what is the fix?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "current namespace",
+        "description": "Names the resolution rule itself, not just the word namespace: an unqualified Foo::class resolves through the current namespace once the import is gone"
+      },
+      {
+        "type": "content_contains",
+        "value": "13.4",
+        "description": "Names the leg that broke. Left as the bare version on purpose: SKILL.md says 'the line that still has to support the old version' and the reference says 'the leg that was working', so a phrase like '13.4 leg' would fail a correct answer that used either wording"
+      },
+      {
+        "type": "content_contains",
+        "value": "change the usage",
+        "description": "Sends the fix at the usage rather than the import line \u2014 the wording both SKILL.md and references/upgrade-v13-to-v14.md use"
+      }
+    ]
   }
 ]
