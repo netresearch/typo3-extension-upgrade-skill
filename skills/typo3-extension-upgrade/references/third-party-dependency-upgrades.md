@@ -138,9 +138,11 @@ itself already fires a generic, version-independent lifecycle event that fires f
 ANY entity of the relevant kind, and synthesize the missing domain event from that
 instead — no changes to the third-party code at all.
 
-For TYPO3 v13 Extbase specifically, `TYPO3\CMS\Extbase\Event\Persistence\EntityAddedToPersistenceEvent`
-fires for every Extbase object being persisted, independent of which extension owns
-the entity:
+For TYPO3 Extbase, `TYPO3\CMS\Extbase\Event\Persistence\EntityAddedToPersistenceEvent`
+(present in v12, v13 and v14) fires for every Extbase domain object the persistence
+backend inserts, independent of which extension owns the entity. It is dispatched
+after the new UID has been written back onto the object, so the listener sees a
+complete entity:
 
 ```php
 final class SynthesizeAfterPostCreateEventListener
@@ -161,12 +163,28 @@ final class SynthesizeAfterPostCreateEventListener
 }
 ```
 
-This keeps the shim entirely in your own adapter code, survives future upstream
-releases (no controller patching to re-apply), and generalizes beyond TYPO3: most
-frameworks with an ORM/persistence layer expose a comparable generic "entity
-persisted" hook (Doctrine's `postPersist`, Symfony's `kernel.view`-adjacent
-lifecycle events) that can serve the same role when a third-party dependency lacks
-a fine-grained domain event you need.
+The `#[AsEventListener]` attribute exists from v13 on; on v12 register the same class
+in `Configuration/Services.yaml` with the `event.listener` tag.
+
+Know the scope you are buying — the synthesized event is not a drop-in equal of the
+event the fork dispatched, and it differs in both directions:
+
+- **Broader**: it fires for every Extbase `add()` of a `Post` — any controller action,
+  backend module or CLI command that goes through the repository — not only the one
+  action the fork dispatched from. Narrow it inside the listener if the consumer is
+  not idempotent.
+- **Narrower**: records written through DataHandler (TYPO3 backend forms, most
+  importers) never pass the Extbase persistence backend and fire no Extbase event at
+  all.
+- **Insert only**: use `EntityUpdatedInPersistenceEvent` for updates, and
+  `EntityFinalizedAfterPersistenceEvent` where the listener needs the reference index
+  already written.
+
+This keeps the shim entirely in your own adapter code and survives future upstream
+releases (no controller patching to re-apply). The technique generalizes beyond
+TYPO3: an ORM that exposes a generic "entity persisted" hook — Doctrine's
+`postPersist`, for instance — serves the same role when a third-party dependency
+lacks the fine-grained domain event you need.
 
 ### Step 5: Version Detection Pitfalls
 
