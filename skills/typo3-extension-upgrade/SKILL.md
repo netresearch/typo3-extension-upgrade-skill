@@ -65,23 +65,28 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
    import. `createMock` on a removed class cannot be repaired by swapping the
    name either — see `references/upgrade-v13-to-v14.md`
 
-   **Then run this skill's own checks, before the suite and again after the
-   edits.** They are scripts, not advice, and one of them (`TU-58`) fails on
-   exactly the deleted-import edit above. `SKILL_DIR` is the base directory
-   the skill loader printed for this skill; the runner lives in the sibling
-   skill `automated-assessment`, installed beside it:
+   **Then run this, from the extension root, before the suite and again after
+   the edits.** It is the check for the edit above, as a block that runs as
+   pasted — no path to find, no variable to bind. A line of output is a file
+   that uses a removed type by its short name with no `use` line for it; fix
+   each one before step 10. No output and exit 0 is clean — it exits 1 on a
+   finding, so `&& phpunit` after it does not run the suite over the fault.
    ```bash
-   # from the extension root: every target in the file resolves against it
-   "$SKILL_DIR/../automated-assessment/scripts/run-checkpoints.sh" --force \
-     "$SKILL_DIR/checkpoints.yaml" . | tail -n 20
+   types='TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface'
+   bad=0
+   for f in $(grep -rlE "\b($types)\b" Classes Tests 2>/dev/null); do
+     for t in $(grep -oE "\b($types)\b" "$f" | sort -u); do
+       grep -qE "^use .*\\\\$t;" "$f" || grep -qE "\\\\$t\b" "$f" \
+         || { echo "$f: $t used without import"; bad=1; }
+     done
+   done
+   test "$bad" = 0
    ```
-   Each result line carries the checkpoint id and its description; for a
-   `script` check the evidence says only whether it failed, not where, so on a
-   `TU-58` fail re-run the grep above — the file it lists without a `use`
-   line for the type is the one. Fix every `error` before step 10; a
-   `warning` is a finding for the report. Measured: across twelve
-   trials with these checks installed, none ran them, and the one failure
-   they would have caught went to the test suite instead.
+   The same check is `TU-58` in this skill's `checkpoints.yaml`, for the
+   runner in `automated-assessment`; the block is here because a script has
+   to be reachable to be a shortcut, and measured, across nine trials with the
+   runner installed beside this skill and step 9 naming it, none ran it.
+
 10. **Install the target version and run the suite against it.** A green suite
     on the version already installed proves nothing about the target — that is
     the old code passing old tests. Install first, in two passes, then test:

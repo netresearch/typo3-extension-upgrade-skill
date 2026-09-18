@@ -447,11 +447,12 @@ mechanical:
   # imports it. PHP resolves the bare name through the file's own namespace,
   # `Foo::class` does not fail, and the error surfaces later — on the line
   # that still has to support the old version — naming a class nobody wrote.
-  # Measured twice on OFR-TYPO3-UPGRADE-001 (14 and 18 September 2026): the
-  # agent deletes the `use` line, leaves five createMock calls behind, and the
-  # v13.4 leg dies with five errors. The second time the rule against exactly
-  # this edit was in the SKILL.md body the agent had read. A sentence did not
-  # stop it; this does, before any test runs.
+  # Measured twice, 14 and 18 September 2026, on a real extension sliding its
+  # window from ^12.4 || ^13.4 to ^13.4 || ^14.3: the agent deletes the `use`
+  # line, leaves five createMock calls behind, and the v13.4 leg dies with
+  # five errors. The second time the rule against exactly this edit was in
+  # the SKILL.md body the agent had read. A sentence did not stop it; this
+  # does, before any test runs.
   - id: TU-58
     type: script
     command: |
