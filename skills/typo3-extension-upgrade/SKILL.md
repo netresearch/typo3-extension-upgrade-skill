@@ -209,7 +209,7 @@ Config templates in `assets/`: `rector.php`, `fractor.php`, `phpstan.neon`, `php
 |-----------|-------------|
 | `references/pre-upgrade.md` | Planning checklist, version audit, risk assessment |
 | `references/api-changes.md` | Checking deprecated/removed APIs by TYPO3 version |
-| `references/api-traps.md` | Cross-version footguns: TCA restrictions, boot order, DI bypass |
+| `references/api-traps.md` | Cross-version footguns: TCA restrictions, boot order, DI bypass; establishing an API fact against `TYPO3/typo3` at a ref |
 | `references/upgrade-v11-to-v12.md` | Upgrading from TYPO3 v11 to v12 |
 | `references/upgrade-v12-to-v13.md` | Upgrading from TYPO3 v12 to v13 |
 | `references/upgrade-v13-to-v14.md` | Upgrading from TYPO3 v13 to v14 |

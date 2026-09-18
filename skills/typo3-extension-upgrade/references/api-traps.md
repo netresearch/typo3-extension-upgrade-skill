@@ -4,6 +4,52 @@ Architectural rules and silent footguns that bite across TYPO3 v12, v13, and v14
 
 ---
 
+## Establish an API Fact Before You Write It Down
+
+Every entry below is a claim about a class that ships in a specific branch of
+`TYPO3/typo3`. Recalling one is how three of them get stated at once and one of
+them is wrong — the wrong one reads exactly like the other two, and it survives
+review because the diff shows the sentence, not the source.
+
+Two calls settle it, and they need no checkout:
+
+```bash
+# 1. Does it exist, and on WHICH branches? Run it per supported LTS.
+#    Judge on the EXIT STATUS: a 404 body still prints, and --jq emits `null`
+#    for it, so an emptiness test reports the opposite of the truth.
+P=typo3/sysext/core/Classes/Attribute/AsEventListener.php
+for r in 12.4 13.4 14.3; do
+  if gh api "repos/TYPO3/typo3/contents/$P?ref=$r" >/dev/null 2>&1
+  then echo "$r: present"
+  else echo "$r: ABSENT"
+  fi
+done
+
+# 2. Who dispatches or consumes it? The dispatch SITES bound the scope claim.
+gh api "search/code?q=EntityAddedToPersistenceEvent+repo:TYPO3/typo3" --jq '.items[].path'
+```
+
+Call 1 dates the API. An attribute or class absent from `12.4` and present on
+`13.4` means the dual-compatibility note is mandatory, not optional — this is
+how `#[AsEventListener]` is v13+ while the `Services.yaml` `event.listener` tag
+covers v12 (`upgrade-v12-to-v13.md`).
+
+Call 2 is what licenses a *scope* claim, and it is the one that gets skipped.
+"Fires for every entity being persisted" is a statement about the call sites: if
+`search/code` returns exactly one dispatch site, open it and read the
+surrounding method, because that method's name is the real scope. For
+`EntityAddedToPersistenceEvent` the single site is
+`Extbase/Classes/Persistence/Generic/Backend.php::insertObject`, immediately
+after `_setProperty(PROPERTY_UID, $uid)` — which yields three facts no summary
+carries: the UID is available to the listener, the event fires on *insert* only,
+and a record written through DataHandler produces no Extbase event at all.
+
+Write the branch you checked into the sentence you publish. A claim that names
+`13.4` can be re-checked in one call; one that names "v13" cannot be
+distinguished from a memory.
+
+---
+
 ## `Connection::select()` Applies TCA Restrictions Silently
 
 `TYPO3\CMS\Core\Database\Connection::select()` (the convenience wrapper, not the QueryBuilder fluent API) applies the **default `RestrictionContainer`**, which includes `DeletedRestriction`, `HiddenRestriction`, and `StartTimeRestriction` per TCA. Code reaching for "I just want to read the row" misses every soft-deleted / hidden / time-restricted record.
