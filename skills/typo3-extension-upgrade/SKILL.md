@@ -69,15 +69,18 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
    the edits.** It is the check for the edit above, as a block that runs as
    pasted — no path to find, no variable to bind. A line of output is a file
    that uses a removed type by its short name with no `use` line for it; fix
-   each one before step 10. No output is clean.
+   each one before step 10. No output and exit 0 is clean — it exits 1 on a
+   finding, so `&& phpunit` after it does not run the suite over the fault.
    ```bash
    types='TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface'
+   bad=0
    for f in $(grep -rlE "\b($types)\b" Classes Tests 2>/dev/null); do
      for t in $(grep -oE "\b($types)\b" "$f" | sort -u); do
        grep -qE "^use .*\\\\$t;" "$f" || grep -qE "\\\\$t\b" "$f" \
-         || echo "$f: $t used without import"
+         || { echo "$f: $t used without import"; bad=1; }
      done
    done
+   test "$bad" = 0
    ```
    The same check is `TU-58` in this skill's `checkpoints.yaml`, for the
    runner in `automated-assessment`; the block is here because a script has
