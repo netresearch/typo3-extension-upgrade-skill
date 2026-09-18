@@ -451,9 +451,12 @@ mechanical:
   # from ^12.4 || ^13.4 to ^13.4 || ^14.3: the agent deleted the `use` line,
   # left five createMock calls behind, and the v13.4 leg died with five
   # errors — with the rule against exactly this edit sitting in a reference
-  # the trial never opened. One occurrence in thirty-six trials since; a
-  # second one first reported for 18 September was a loose count matching a
-  # compat stub's class name, not this edit. This runs before any test does.
+  # the trial never opened. One occurrence in forty-two trials on that case
+  # (five rounds, 14 to 18 September); a second one first reported for 18
+  # September was a loose count matching a compat stub's class name, not
+  # this edit. That figure is how often the edit happens. How often the
+  # check runs is a different count and lives in SKILL.md step 9: as a
+  # fenced block there it was pasted and run in five of six trials.
   - id: TU-58
     type: script
     command: |
