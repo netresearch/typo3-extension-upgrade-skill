@@ -64,6 +64,20 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
    that still has to support the old version. Change the usage, not the
    import. `createMock` on a removed class cannot be repaired by swapping the
    name either — see `references/upgrade-v13-to-v14.md`
+
+   **Then run this skill's own checks, before the suite and again after the
+   edits.** They are scripts, not advice, and one of them (`TU-58`) fails on
+   exactly the deleted-import edit above. `SKILL_DIR` is the base directory
+   the skill loader printed for this skill; the runner lives in the sibling
+   skill `automated-assessment`, installed beside it:
+   ```bash
+   "$SKILL_DIR/../automated-assessment/scripts/run-checkpoints.sh" --force \
+     "$SKILL_DIR/checkpoints.yaml" . | tail -n 20
+   ```
+   Each `fail` line names the file and the rule. Fix every `error` before
+   step 10; a `warning` is a finding for the report. Measured: across twelve
+   trials with these checks installed, none ran them, and the one failure
+   they would have caught went to the test suite instead.
 10. **Install the target version and run the suite against it.** A green suite
     on the version already installed proves nothing about the target — that is
     the old code passing old tests. Install first, in two passes, then test:
