@@ -83,9 +83,11 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
    test "$bad" = 0
    ```
    The same check is `TU-58` in this skill's `checkpoints.yaml`, for the
-   runner in `automated-assessment`; the block is here because a script has
-   to be reachable to be a shortcut, and measured, across nine trials with the
-   runner installed beside this skill and step 9 naming it, none ran it.
+   runner in `automated-assessment`. The block is here because a script has
+   to be reachable to be a shortcut. Measured on the same case and model, at
+   this step: an instruction to run the runner was in context in three of
+   three trials and run in none; this block, pasted whole, was run in five
+   of six.
 
 10. **Install the target version and run the suite against it.** A green suite
     on the version already installed proves nothing about the target — that is

@@ -447,12 +447,16 @@ mechanical:
   # imports it. PHP resolves the bare name through the file's own namespace,
   # `Foo::class` does not fail, and the error surfaces later — on the line
   # that still has to support the old version — naming a class nobody wrote.
-  # Measured twice, 14 and 18 September 2026, on a real extension sliding its
-  # window from ^12.4 || ^13.4 to ^13.4 || ^14.3: the agent deletes the `use`
-  # line, leaves five createMock calls behind, and the v13.4 leg dies with
-  # five errors. The second time the rule against exactly this edit was in
-  # the SKILL.md body the agent had read. A sentence did not stop it; this
-  # does, before any test runs.
+  # Measured on 14 September 2026, on a real extension sliding its window
+  # from ^12.4 || ^13.4 to ^13.4 || ^14.3: the agent deleted the `use` line,
+  # left five createMock calls behind, and the v13.4 leg died with five
+  # errors — with the rule against exactly this edit sitting in a reference
+  # the trial never opened. One occurrence in forty-two trials on that case
+  # (five rounds, 14 to 18 September); a second one first reported for 18
+  # September was a loose count matching a compat stub's class name, not
+  # this edit. That figure is how often the edit happens. How often the
+  # check runs is a different count and lives in SKILL.md step 9: as a
+  # fenced block there it was pasted and run in five of six trials.
   - id: TU-58
     type: script
     command: |
