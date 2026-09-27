@@ -73,15 +73,19 @@ hook with `--no-verify`, and a fourth bypassed its own failing unit tests.
    finding, so `&& phpunit` after it does not run the suite over the fault.
    ```bash
    types='TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface'
+   strip='foreach (token_get_all(file_get_contents($argv[1])) as $t) { if (!is_array($t)) { echo $t; } elseif (!in_array($t[0], [T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE], true)) { echo $t[1]; } }'
    bad=0
-   for f in $(grep -rlE "\b($types)\b" Classes Tests 2>/dev/null); do
-     for t in $(grep -oE "\b($types)\b" "$f" | sort -u); do
-       grep -qE "^use .*\\\\$t;" "$f" || grep -qE "\\\\$t\b" "$f" \
+   for f in $(grep -rlE --include='*.php' "\b($types)\b" Classes Tests 2>/dev/null); do
+     code=$(php -r "$strip" "$f")
+     for t in $(grep -oE "\b($types)\b" <<<"$code" | sort -u); do
+       grep -qE "^use .*\\\\$t;" <<<"$code" || grep -qE "\\\\$t\b" <<<"$code" \
          || { echo "$f: $t used without import"; bad=1; }
      done
    done
    test "$bad" = 0
    ```
+   Comments and string literals are stripped first: a docblock naming a
+   removed type is not a reference PHP resolves.
    The same check is `TU-58` in this skill's `checkpoints.yaml`, for the
    runner in `automated-assessment`. The block is here because a script has
    to be reachable to be a shortcut. Measured on the same case and model, at
