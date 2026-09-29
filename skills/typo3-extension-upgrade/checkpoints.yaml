@@ -172,9 +172,11 @@ mechanical:
   - id: TU-09
     type: regex
     target: composer.json
-    pattern: '"typo3/cms-core"\s*:\s*"[^"]*1[23]\.'
+    # Any supported LTS counts: an extension that supports only v14.3 LTS is
+    # valid and was reported by the former `1[23]` pattern.
+    pattern: '"typo3/cms-core"\s*:\s*"([^"]*[^"0-9.])?1[234]\.'
     severity: warning
-    desc: "TYPO3 constraint should include v12 or v13"
+    desc: "TYPO3 constraint should include a supported LTS (v12.4, v13.4 or v14.3)"
 
   # === DEPRECATED API DETECTION ===
   - id: TU-10
@@ -457,14 +459,26 @@ mechanical:
   # this edit. That figure is how often the edit happens. How often the
   # check runs is a different count and lives in SKILL.md step 9: as a
   # fenced block there it was pasted and run in five of six trials.
+  #
+  # Comments and string literals are stripped with PHP's tokenizer before
+  # matching: only a name in code is resolved against the namespace, and a
+  # docblock mentioning StandaloneView (t3x-nr-repurpose at ae29b2f,
+  # SchaubildGenerator.php:282) was reported as a missing import. Without
+  # php on PATH the raw file is matched, as before.
   - id: TU-58
     type: script
     command: |
       types='TypoScriptFrontendController|StandaloneView|TemplateView|HashService|LocalPreviewHelper|LocalCropScaleMaskHelper|FreezableBackendInterface'
+      strip='foreach (token_get_all(file_get_contents($argv[1])) as $t) { if (!is_array($t)) { echo $t; } elseif (!in_array($t[0], [T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE], true)) { echo $t[1]; } }'
       bad=0
-      for f in $(grep -rlE "\b($types)::class|\b($types)\b" Classes Tests 2>/dev/null); do
-        for t in $(grep -oE "\b($types)\b" "$f" | sort -u); do
-          if ! grep -qE "^use .*\\\\$t;" "$f" && ! grep -qE "\\\\$t\b" "$f"; then
+      for f in $(grep -rlE --include='*.php' "\b($types)\b" Classes Tests 2>/dev/null); do
+        if command -v php >/dev/null 2>&1; then
+          code=$(php -r "$strip" "$f")
+        else
+          code=$(cat "$f")
+        fi
+        for t in $(printf '%s\n' "$code" | grep -oE "\b($types)\b" | sort -u); do
+          if ! printf '%s\n' "$code" | grep -qE "^use .*\\\\$t;" && ! printf '%s\n' "$code" | grep -qE "\\\\$t\b"; then
             printf '%s: %s used without import\n' "$f" "$t"
             bad=1
           fi
