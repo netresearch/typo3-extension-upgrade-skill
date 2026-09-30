@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 Extension Upgrade Skill
 
 A Claude Code skill for systematically upgrading TYPO3 extensions to newer LTS versions.

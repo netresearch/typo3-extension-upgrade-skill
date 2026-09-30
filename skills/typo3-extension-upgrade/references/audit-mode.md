@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Audit mode: report vs. auto-fix
 
 Use this when the goal is to **assess/report** — produce an upgrade estimate or file issues — rather than to apply the upgrade. The aim is to ticket only the work that is genuinely manual, so the backlog does not fill with noise that the toolchain fixes on its own.

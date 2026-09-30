@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Understanding Rector/Fractor Output
 
 **CRITICAL: Always run with `--dry-run` first and review the output before applying changes.**

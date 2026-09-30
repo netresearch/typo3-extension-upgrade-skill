@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Third-Party Dependency Major Version Upgrades
 
 When `composer.json` constraints widen to include a new major version of ANY dependency

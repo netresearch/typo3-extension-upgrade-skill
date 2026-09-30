@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 Multi-Version Compatibility (v12 + v13 + v14)
 
 When extension must support `^12.4 || ^13.4 || ^14.1`.

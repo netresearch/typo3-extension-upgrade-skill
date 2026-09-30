@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 """Behaviour tests for the shell scripts this repository ships.
 
 Covered: skills/typo3-extension-upgrade/scripts/scan-deprecations.sh,

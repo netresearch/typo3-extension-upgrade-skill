@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # scan-deprecations.sh - deterministic grep scan for TYPO3 API deprecations/removals
 #
 # Mirrors every "Search Pattern" grep recipe documented in references/api-changes.md

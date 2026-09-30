@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Multi-Version Worktrees and Backports
 
 Concrete patterns for upgrading an extension across multiple TYPO3 LTS versions in parallel, and for backporting fixes from `main` to maintenance branches.

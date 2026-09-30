@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # API Changes Reference
 
 Search patterns, replacements, and key breaking changes organized by TYPO3 version upgrade path.

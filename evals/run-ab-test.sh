@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # A/B test: WITHOUT skill vs WITH skill
 # Measures: output volume (chars), assertion pass rate, specificity
 set -euo pipefail
