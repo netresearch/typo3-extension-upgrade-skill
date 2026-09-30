@@ -48,7 +48,7 @@ check_05() {
 }
 
 check_06() {
-    grep -rn "SignalSlotDispatcher\|->connect\(" "$target/Classes/"
+    grep -rn "SignalSlotDispatcher\|->connect(" "$target/Classes/"
 }
 
 check_07() {
@@ -60,7 +60,7 @@ check_08() {
 }
 
 check_09() {
-    grep -rn "SignalSlotDispatcher\|->emit\|->connect\(" "$target/Classes/"
+    grep -rn "SignalSlotDispatcher\|->emit\|->connect(" "$target/Classes/"
 }
 
 check_10() {
@@ -93,7 +93,7 @@ check_16() {
 }
 
 check_17() {
-    grep -rn "'eval'.*'required'" "$target/Configuration/TCA/"
+    grep -rn "'eval'\s*=>\s*'[^']*required" "$target/Configuration/TCA/"
 }
 
 check_18() {
@@ -129,7 +129,8 @@ check_25() {
 }
 
 check_26() {
-    grep -rn "registerModule\|TYPO3_MOD_PATH" "$target/ext_tables.php"
+    # -H: name the file even though a single file is searched, like every other match
+    grep -rHn "registerModule\|TYPO3_MOD_PATH" "$target/ext_tables.php"
 }
 
 check_27() {
@@ -195,12 +196,13 @@ check_40() {
 }
 
 check_41() {
-    grep -rn "SC_OPTIONS\['t3lib/class.t3lib_page.php'\]" "$target/ext_localconf.php"
-    grep -rn "additionalQueryRestrictions" "$target/ext_localconf.php"
+    # -H: name the file even though a single file is searched, like every other match
+    grep -rHn "SC_OPTIONS\['t3lib/class.t3lib_page.php'\]" "$target/ext_localconf.php"
+    grep -rHn "additionalQueryRestrictions" "$target/ext_localconf.php"
 }
 
 check_42() {
-    grep -rn "PropertyInfo\\Type\|Type::BUILTIN_TYPE_" "$target/Classes/"
+    grep -rn "PropertyInfo\\\\Type\|Type::BUILTIN_TYPE_" "$target/Classes/"
 }
 
 check_43() {
