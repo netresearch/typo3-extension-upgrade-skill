@@ -178,8 +178,8 @@ A passing run prints a dot per test and ends with `OK` and exit code 0. A failur
 
 - **Skill**: the skill itself has no runtime dependency. `scan-deprecations.sh` needs Bash and GNU `grep` (its patterns use `\|` and `\s`).
 - **Composer**: `composer.json` requires `netresearch/composer-agent-skill-plugin` for installation through Composer. No `composer.lock` is committed (`.gitignore`).
-- **Development and CI tools**: pre-commit hooks are pinned by `rev:` in `.pre-commit-config.yaml`. CI tools come from the shared workflows in `netresearch/.github`, `netresearch/skill-repo-skill` and `netresearch/typo3-ci-workflows`, which pin actions by commit SHA and tool versions by number.
-- **Updates**: Renovate (`renovate.json`, `config:recommended` with the `pre-commit` manager enabled) opens update pull requests; `auto-merge-deps.yml` merges dependency pull requests through the shared auto-merge workflow.
+- **Development and CI tools**: pre-commit hooks are pinned by `rev:` in `.pre-commit-config.yaml`. CI tools come from the shared workflows in `netresearch/.github`, `netresearch/skill-repo-skill` and `netresearch/typo3-ci-workflows`, which pin every action by commit SHA.
+- **Updates**: Renovate (`renovate.json`, `config:recommended` with the `pre-commit` manager enabled) opens update pull requests. For pull requests opened by Renovate or Dependabot, `auto-merge-deps.yml` approves them and enables auto-merge through the shared workflow, unless they carry the label `deps-major` or `deps-no-automerge`; the merge waits for the required checks.
 - **Checks**: dependency review and Composer Audit (see below) check dependency changes on pull requests. New dependencies follow the licence and vulnerability rules of the organisation's [handling of dependency and code analysis findings](https://github.com/netresearch/.github/blob/main/SECURITY.md#handling-of-dependency-and-code-analysis-findings).
 
 ## Governance and policies
