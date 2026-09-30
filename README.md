@@ -114,17 +114,24 @@ Example prompts:
 
 ```
 typo3-extension-upgrade-skill/
-├── SKILL.md                 # Main skill instructions
-├── README.md                # This file
-├── assets/                  # Configuration templates
-│   ├── rector.php           # Rector configuration
-│   ├── fractor.php          # Fractor configuration
-│   ├── phpstan.neon         # PHPStan configuration
-│   ├── phpunit.xml          # PHPUnit configuration
-│   └── .php-cs-fixer.php    # PHP-CS-Fixer configuration
-└── references/              # Detailed documentation
-    ├── api-changes.md       # Version-specific API migrations (v7-v14)
-    └── pre-upgrade.md       # Pre-upgrade checklist
+├── README.md                          # This file
+├── agents/upgrade-planner.md          # Upgrade planning agent
+├── commands/                          # /assess and /rector slash commands
+└── skills/typo3-extension-upgrade/
+    ├── SKILL.md                       # Main skill instructions
+    ├── checkpoints.yaml               # Assessment checkpoints
+    ├── assets/                        # Configuration templates
+    │   ├── rector.php                 # Rector configuration
+    │   ├── fractor.php                # Fractor configuration
+    │   ├── phpstan.neon               # PHPStan configuration
+    │   ├── phpunit.xml                # PHPUnit configuration
+    │   └── .php-cs-fixer.php          # PHP-CS-Fixer configuration
+    ├── references/                    # Detailed documentation (14 files)
+    │   ├── api-changes.md             # Version-specific API migrations (v7-v14)
+    │   ├── pre-upgrade.md             # Pre-upgrade checklist
+    │   └── ...                        # Version guides, dual compatibility, verification, troubleshooting
+    └── scripts/
+        └── scan-deprecations.sh       # Report-only grep scan for deprecated APIs and traps
 ```
 
 ## Key Resources
