@@ -47,7 +47,7 @@ Boundary 1 lies between the scan script and the analysed extension: file content
 
 ### 3. Changes pass automated checks
 
-Every workflow declares `permissions: {}` at the top and grants each job only what its reusable workflow needs. The two workflows that run on `pull_request_target` (`auto-merge-deps.yml`, `labeler.yml`) call shared workflows in `netresearch/.github` that contain no checkout step and run no pull request code; `auto-merge-deps.yml` says so in its header comment and passes only the two merge-app secrets, not `secrets: inherit`. The checks themselves, and which of them branch protection requires, are listed in [README.md](../README.md#governance-and-policies).
+Every workflow declares `permissions: {}` at the top and grants each job only what its reusable workflow needs. The two workflows that run on `pull_request_target` (`auto-merge-deps.yml`, `labeler.yml`) call shared workflows in `netresearch/.github` that contain no checkout step and run no pull request code; `auto-merge-deps.yml` says so in its header comment and passes only the two merge-app secrets, not `secrets: inherit`. The checks themselves are listed in [README.md](../README.md#governance-and-policies).
 
 ## Common weaknesses
 

@@ -152,6 +152,54 @@ typo3-extension-upgrade-skill/
 - [TYPO3 Fractor](https://github.com/andreaswolf/fractor) - Non-PHP migrations
 - [Extension Scanner](https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ExtensionArchitecture/HowTo/UpdateExtensions/ExtensionScanner.html) - API diagnostics
 
+## Contributing
+
+Changes are proposed as pull requests against `main`. New or changed behaviour of a script needs a test in `tests/test_scripts.py` in the same pull request.
+
+### Tests
+
+`tests/test_scripts.py` holds the behaviour tests for the shell scripts. It uses the Python standard library only and needs `python3`, `bash`, GNU `grep` and `git`:
+
+```bash
+python3 tests/test_scripts.py
+```
+
+What the tests cover:
+
+- `skills/typo3-extension-upgrade/scripts/scan-deprecations.sh`: each of the 45 checks against a fixture only it should match, negative cases, the summaries, a missing path and the default target.
+- `Build/Scripts/check-plugin-version.sh` and the `Build/hooks/pre-push` hook that calls it: untagged, matching, mismatching and non-semver tags in a temporary git repository.
+- `scripts/verify-harness.sh`: harness layouts from empty to complete, over-long `AGENTS.md`, broken references, undocumented composer scripts, GitHub annotation output and invalid arguments.
+
+`evals/run-ab-test.sh` has no test: it calls the `claude` CLI, which runs paid model requests.
+
+A passing run prints a dot per test and ends with `OK` and exit code 0. A failure prints `FAIL:` with the test name; for the scan checks the `check=` and `label=` fields name the check function and the heading it should have printed, and the exit code is 1. CI runs the same file in the Skill Tests workflow (`.github/workflows/tests.yml`) on every pull request and every push to `main`.
+
+### Dependencies
+
+- **Skill**: the skill itself has no runtime dependency. `scan-deprecations.sh` needs Bash and GNU `grep` (its patterns use `\|` and `\s`).
+- **Composer**: `composer.json` requires `netresearch/composer-agent-skill-plugin` for installation through Composer. No `composer.lock` is committed (`.gitignore`).
+- **Development and CI tools**: pre-commit hooks are pinned by `rev:` in `.pre-commit-config.yaml`. CI tools come from the shared workflows in `netresearch/.github`, `netresearch/skill-repo-skill` and `netresearch/typo3-ci-workflows`, which pin actions by commit SHA and tool versions by number.
+- **Updates**: Renovate (`renovate.json`, `config:recommended` with the `pre-commit` manager enabled) opens update pull requests; `auto-merge-deps.yml` merges dependency pull requests through the shared auto-merge workflow.
+- **Checks**: dependency review and Composer Audit (see below) check dependency changes on pull requests. New dependencies follow the licence and vulnerability rules of the organisation's [handling of dependency and code analysis findings](https://github.com/netresearch/.github/blob/main/SECURITY.md#handling-of-dependency-and-code-analysis-findings).
+
+## Governance and policies
+
+This repository follows the Netresearch organisation policies:
+
+- [Governance](https://github.com/netresearch/.github/blob/main/GOVERNANCE.md): ownership, roles, and how decisions are made and disputes resolved.
+- [Roadmap](https://github.com/netresearch/.github/blob/main/ROADMAP.md): planned and explicitly excluded work for the coming year.
+- [Handling of dependency and code analysis findings](https://github.com/netresearch/.github/blob/main/SECURITY.md#handling-of-dependency-and-code-analysis-findings): thresholds, deadlines and the exception process for dependency (SCA) and static analysis (SAST) findings.
+- [Secret management](https://github.com/netresearch/.github/blob/main/SECURITY.md#secret-management): how CI and release credentials are stored, accessed and rotated.
+- [Access roster](https://github.com/netresearch/.github/blob/main/docs/access-roster.md): who holds administrative access to this repository and the organisation.
+
+The security assurance case for this skill (threat model, trust boundaries, countermeasures and limits) is in [docs/SECURITY-ASSURANCE.md](docs/SECURITY-ASSURANCE.md); components and data flow are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+Checks that run on pull requests in this repository:
+
+- Every pull request: Skill Validation (`lint.yml`: skill structure, manifest sync, markdownlint, yamllint, actionlint, JSON syntax, ShellCheck, Ruff, checkpoint schema), Eval Validation (`eval-validate.yml`) and Skill Tests (`tests.yml`: `tests/test_scripts.py`).
+- Pull requests to `main`: `security.yml` with Betterleaks (secret scanning), zizmor (workflow static analysis), dependency review (fails on vulnerabilities of severity high or above), Composer Audit and Opengrep SAST (fails on findings of severity WARNING or above); Harness Verification (`harness-verify.yml`) and Template Drift (`check-template-drift.yml`).
+- Secret detection: Betterleaks in `security.yml` on pull requests to `main` and pushes to `main`, and GitHub secret scanning with push protection, which is enabled for this repository.
+
 ## Author
 
 **Netresearch DTT GmbH**
