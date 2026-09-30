@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+name: Skill Tests
+
+# Runs tests/test_scripts.py, the behaviour tests for the shipped shell
+# scripts (skills/typo3-extension-upgrade/scripts/scan-deprecations.sh,
+# Build/Scripts/check-plugin-version.sh with Build/hooks/pre-push, and
+# scripts/verify-harness.sh), through the skill-repo-skill tests reusable.
+# The suite is stdlib-only Python; the reusable runs it with python3 and fails
+# the job when it exits non-zero. require_tests makes the job fail if the glob
+# ever matches no test file while the skill ships scripts.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: {}
+
+jobs:
+  tests:
+    uses: netresearch/skill-repo-skill/.github/workflows/tests.yml@main
+    permissions:
+      contents: read
+    with:
+      python_glob: "tests/*.py"
+      require_tests: true
