@@ -299,6 +299,88 @@ available." while `/package/` correctly answered 404.
 
 ---
 
+## A Discarded `redirect()` in a Guard Is an Authorization Bypass Since v12
+
+Up to v11, `ActionController::redirect()` and `redirectToUri()` ended the
+action by throwing `StopActionException` (deprecated in 11.0, `@return never`).
+Since v12 they return a `RedirectResponse` and throw nothing. A permission
+check written the v11 way still compiles, still runs any flash message added
+before the call, and no longer stops anything:
+
+```php
+// v11: redirect() threw, the save below never ran. v12+: it runs.
+if (!$this->permissions->mayEdit($booking)) {
+    $this->redirect('list');
+}
+$this->bookingRepository->update($booking);
+
+// Correct in v12+: the refusal is the action's response.
+if (!$this->permissions->mayEdit($booking)) {
+    return $this->redirect('list');
+}
+```
+
+Wrapper helpers hide it twice: a helper that calls `$this->redirect()` without
+`return` discards the response itself, and one that does return it is still
+discarded by every caller that does not return the helper's result. Do not
+count on an automated migration having caught it — such a guard compiles,
+passes static analysis and can survive several major versions unnoticed.
+
+`forward()` is not part of this trap: v12 removed it in favour of returning a
+`ForwardResponse`, so a leftover call is a fatal error and fails closed.
+`forwardToReferringRequest()` (marked `@internal`) already returned
+`?ResponseInterface` in v11, so a discarded call to it is an older bug of the
+same shape rather than a v12 regression; the greps below find it too.
+
+### Search Pattern
+
+```bash
+# a redirect whose response is neither returned nor thrown, at line start ...
+grep -rnE '^[[:space:]]*\$this->(redirect[[:alnum:]_]*|forwardToReferringRequest)\(' Classes/
+# ... and after a brace-less if/else or an opening brace on the same line
+grep -rnE '(\)|else|\{)[[:space:]]*\$this->(redirect[[:alnum:]_]*|forwardToReferringRequest)\(' Classes/
+# then read each hit: inside a permission or validity check, the action must
+# `return` it (or throw it, see the ErrorController section above)
+```
+
+A hit can be the inner line of a call that is used after all — wrapped over
+several lines in `throw new PropagateResponseException(` — so read the line
+above it before calling it the bug. Neither pattern finds a response assigned
+to a variable that is never returned (`$response = $this->redirect(...);`) or
+a call after `;`, `&&`, `||` or `?:` on the same line: look for those where an
+action has several exits.
+
+### When Was It Introduced?
+
+Not when the guard line last changed: `git log -S` on the call finds the last
+commit that touched it, not the one that changed its meaning. The behaviour
+flipped with the core bump — list the locked `typo3/cms-extbase` version per
+`composer.lock` commit and read where it goes from 11.x to 12.x:
+
+```bash
+git log --format='%h %ad' --date=short -- composer.lock | while read -r c d; do
+  echo "$c $d $(git show "$c:composer.lock" 2>/dev/null \
+    | jq -r '.packages[]|select(.name=="typo3/cms-extbase")|.version')"
+done
+```
+
+(`-G'typo3/cms-extbase'` does not find it: the package's `name` line never
+changes, only its `version` line does.) In one real case, `git log -S` on the
+guard named a later refactoring commit, months after the upgrade commit the
+lock file named.
+
+### Affected
+
+Every Extbase action migrated from v11 whose guard calls `redirect()`,
+`redirectToUri()` or a helper around them without `return`. Where the guarded
+object comes from a form, the guard is the only protection: the
+`__trustedProperties` HMAC signs the `__identity` field's name but not the uid
+it holds — see the [security-audit skill](https://github.com/netresearch/security-audit-skill),
+`references/modern-attacks.md` → *TYPO3: The HMAC Does Not Sign the
+`__identity` Value (IDOR)*.
+
+---
+
 ## See Also
 
 - `upgrade-v11-to-v12.md` — v12 FormEngine DI nodes (`setData()` workaround for [#100670](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.4/Deprecation-100670-DIAwareFormEngineNodes.html))
