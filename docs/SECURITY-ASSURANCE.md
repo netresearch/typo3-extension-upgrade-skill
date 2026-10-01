@@ -19,7 +19,7 @@ This document states what users of the typo3-extension-upgrade skill can and can
 
 1. The scan script only reads the extension it analyses. It does not execute the extension's code, install dependencies, write files or contact the network.
 2. The skill and its releases are delivered unmodified from this repository.
-3. Changes reach `main` only through the checks listed in [README.md](../README.md#governance-and-policies).
+3. Changes to `main` are proposed as pull requests, on which the checks listed in [README.md](../README.md#governance-and-policies) run.
 
 ## Actors and trust boundaries
 
