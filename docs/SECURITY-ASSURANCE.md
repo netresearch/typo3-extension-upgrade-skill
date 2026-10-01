@@ -12,7 +12,7 @@ This document states what users of the typo3-extension-upgrade skill can and can
 | Skill instructions and references | `skills/typo3-extension-upgrade/SKILL.md`, `skills/typo3-extension-upgrade/references/*.md`, `agents/upgrade-planner.md`, `commands/assess.md`, `commands/rector.md` | No. Text an AI agent loads. The text tells the agent which commands to run in the user's extension (see [Actors and trust boundaries](#actors-and-trust-boundaries)). |
 | Checkpoints | `skills/typo3-extension-upgrade/checkpoints.yaml` | No. Data read by an assessment runner. |
 | Scan script | `skills/typo3-extension-upgrade/scripts/scan-deprecations.sh` | Yes. Bash, run by the user or the agent against an extension directory. |
-| Configuration templates | `skills/typo3-extension-upgrade/assets/` | No. Rector, Fractor, PHPStan, PHPUnit and PHP-CS-Fixer configuration a user copies into an extension. |
+| Configuration templates | `skills/typo3-extension-upgrade/assets/` | Not in this repository. Rector, Fractor, PHPStan, PHPUnit and PHP-CS-Fixer configuration a user copies into an extension; `rector.php`, `fractor.php` and `.php-cs-fixer.php` are PHP that those tools execute with the user's permissions once copied. |
 | Repository tooling | `Build/Scripts/check-plugin-version.sh`, `Build/hooks/pre-push`, `scripts/verify-harness.sh`, `evals/run-ab-test.sh`, `tests/test_scripts.py` | Yes, for maintainers and CI only. |
 
 ## Security requirements

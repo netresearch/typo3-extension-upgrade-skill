@@ -166,7 +166,7 @@ python3 tests/test_scripts.py
 
 What the tests cover:
 
-- `skills/typo3-extension-upgrade/scripts/scan-deprecations.sh`: each of the 45 checks against a fixture only it should match, negative cases, the summaries, a missing path and the default target.
+- `skills/typo3-extension-upgrade/scripts/scan-deprecations.sh`: each of the 45 checks against a fixture it must match (a fixture can match other checks too, for example `->connect(` matches checks 06 and 09), negative cases, the summaries, a missing path and the default target.
 - `Build/Scripts/check-plugin-version.sh` and the `Build/hooks/pre-push` hook that calls it: untagged, matching, mismatching and non-semver tags in a temporary git repository.
 - `scripts/verify-harness.sh`: harness layouts from empty to complete, over-long `AGENTS.md`, broken references, undocumented composer scripts, GitHub annotation output and invalid arguments.
 

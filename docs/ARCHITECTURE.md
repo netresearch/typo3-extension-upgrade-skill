@@ -5,7 +5,7 @@
 
 ## Purpose
 
-This repository is an AI agent skill that provides procedural knowledge for upgrading TYPO3 extensions to newer LTS versions. It consists mostly of structured documentation, configuration templates, and evaluation criteria. The skill ships one executable helper, `scripts/scan-deprecations.sh`; the other scripts in the repository serve its maintenance (see [Scripts and tests](#scripts-and-tests)).
+This repository is an AI agent skill that provides procedural knowledge for upgrading TYPO3 extensions to newer LTS versions. It consists mostly of structured documentation, configuration templates, and evaluation criteria. The skill ships one executable helper, `skills/typo3-extension-upgrade/scripts/scan-deprecations.sh`; the other scripts in the repository serve its maintenance (see [Scripts and tests](#scripts-and-tests)).
 
 ## Component Overview
 
