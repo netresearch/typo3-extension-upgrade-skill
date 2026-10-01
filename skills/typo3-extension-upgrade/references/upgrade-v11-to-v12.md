@@ -66,6 +66,15 @@ $rectorConfig->sets([
 
 ## v12-Specific Gotchas
 
+### `redirect()` No Longer Ends the Action
+
+`redirect()`/`redirectToUri()` threw `StopActionException` up to v11 and return
+a `RedirectResponse` since v12. Every guard that calls one without `return`
+keeps running past its own refusal — in a permission check that is an
+authorization bypass. Grep and fix before the upgrade ships:
+`api-traps.md` → *A Discarded `redirect()` in a Guard Is an Authorization
+Bypass Since v12*.
+
 ### FormEngine DI Nodes Need Their Own `setData()`
 
 > **Source**: [Deprecation #100670 — DI-aware FormEngine nodes](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.4/Deprecation-100670-DIAwareFormEngineNodes.html)
