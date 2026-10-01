@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Pre-Upgrade Checklist
 
 Use this checklist before starting a TYPO3 extension upgrade.
@@ -45,8 +48,8 @@ Use this checklist before starting a TYPO3 extension upgrade.
 
 ## Documentation Review
 
-- [ ] Read TYPO3 v12 changelog: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Index.html
-- [ ] Read TYPO3 v13 changelog: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/13.0/Index.html
+- [ ] Read TYPO3 v12 changelog: <https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Index.html>
+- [ ] Read TYPO3 v13 changelog: <https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/13.0/Index.html>
 - [ ] Review breaking changes relevant to extension
 
 ## Version Hardcoding Locations

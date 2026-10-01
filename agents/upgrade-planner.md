@@ -1,4 +1,6 @@
 ---
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 name: "upgrade-planner"
 description: "Plan TYPO3 extension upgrades with breaking change analysis"
 model: "sonnet"

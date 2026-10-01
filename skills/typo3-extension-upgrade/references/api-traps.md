@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 API Traps (Cross-Version)
 
 Architectural rules and silent footguns that bite across TYPO3 v12, v13, and v14. Each one looks innocuous at the call site but produces wrong-but-not-fatal behavior — soft-deleted records vanish, registrations get silently dropped, paths double, DI breaks at runtime.

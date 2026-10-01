@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # API Changes Reference
 
 Search patterns, replacements, and key breaking changes organized by TYPO3 version upgrade path.
@@ -102,7 +105,7 @@ grep -rn "tx_realurl\|cooluri\|simulatestatic" Configuration/
 
 #### Search Pattern
 ```bash
-grep -rn "SignalSlotDispatcher\|->connect\(" Classes/ Tests/
+grep -rn "SignalSlotDispatcher\|->connect(" Classes/ Tests/
 ```
 
 **Note**: Mark for migration to PSR-14 Events (complete in v10).
@@ -143,7 +146,7 @@ services:
 
 #### Search Pattern
 ```bash
-grep -rn "SignalSlotDispatcher\|->emit\|->connect\(" Classes/ Tests/
+grep -rn "SignalSlotDispatcher\|->emit\|->connect(" Classes/ Tests/
 ```
 
 #### Replace
@@ -278,7 +281,7 @@ $value = $request->getParsedBody()['param'] ?? null;
 
 #### Search Pattern
 ```bash
-grep -rn "'eval'.*'required'" Configuration/TCA/
+grep -rn "'eval'\s*=>\s*'[^']*required" Configuration/TCA/
 ```
 
 #### Replace
@@ -1023,7 +1026,7 @@ grep -rn "TYPO3_DB\|exec_SELECTquery" Classes/ Tests/
 grep -rn "tx_realurl\|cooluri\|sys_domain"
 
 # v9→v10: Signal/Slot
-grep -rn "SignalSlotDispatcher\|->connect\(" Classes/ Tests/
+grep -rn "SignalSlotDispatcher\|->connect(" Classes/ Tests/
 
 # v10→v11: Old Fluid
 grep -rn "setTemplatePathAndFilename" Classes/ Tests/
@@ -1263,7 +1266,7 @@ The `Symfony\Component\PropertyInfo\Type` class and its constants are deprecated
 
 #### Search Pattern
 ```bash
-grep -rn "PropertyInfo\\Type\|Type::BUILTIN_TYPE_" Classes/ Tests/
+grep -rn "PropertyInfo\\\\Type\|Type::BUILTIN_TYPE_" Classes/ Tests/
 ```
 
 #### Replace

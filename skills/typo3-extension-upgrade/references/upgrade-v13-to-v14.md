@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 v13 → v14 Upgrade Guide
 
 **Context:** TYPO3 v14.3 LTS released 2026-04-21. v14 introduces the largest breaking-change sweep in several cycles: 98 breaking + 31 deprecations + 105 features + 16 important entries, **all landed in v14.0**. v14.1/14.2/14.3 added zero breaking changes — the LTS stability promise.

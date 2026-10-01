@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 Extension Upgrade Skill
 
 Agent harness for the TYPO3 extension upgrade skill repository.
@@ -9,27 +12,33 @@ Agent harness for the TYPO3 extension upgrade skill repository.
 │   ├── SKILL.md                      # Main skill instructions
 │   ├── assets/                       # Config templates (rector, fractor, phpstan, phpunit)
 │   ├── checkpoints.yaml              # Eval checkpoints
-│   └── references/                   # Detailed upgrade docs per version
+│   ├── references/                   # Detailed upgrade docs per version
+│   └── scripts/                      # scan-deprecations.sh (report-only grep scan)
 ├── agents/                           # Agent definitions
 │   └── upgrade-planner.md            # Upgrade planning agent
 ├── commands/                         # Slash commands
 │   ├── assess.md                     # /assess command
 │   └── rector.md                     # /rector command
 ├── evals/                            # Evaluation suite
-│   └── evals.json
+│   ├── evals.json
+│   └── run-ab-test.sh                # A/B run via the claude CLI (paid, manual only)
 ├── Build/                            # Build tooling
 │   ├── Scripts/                      # Utility scripts
 │   └── hooks/                        # Git hooks (pre-push)
 ├── composer.json                     # Composer package (ai-agent-skill type)
 ├── docs/                             # Architecture and planning docs
 │   └── ARCHITECTURE.md
-└── scripts/                          # Harness scripts
-    └── verify-harness.sh
+├── scripts/                          # Harness scripts
+│   └── verify-harness.sh
+└── tests/                            # Behaviour tests for the shell scripts
+    └── test_scripts.py
 ```
 
 ## Commands
 
-No build system scripts defined in `composer.json`. This is a content-only skill repo.
+No build system scripts defined in `composer.json`. Repository commands:
+- `python3 tests/test_scripts.py` -- behaviour tests for the shell scripts (CI: `.github/workflows/tests.yml`)
+- `bash scripts/verify-harness.sh` -- local agent harness check
 
 Key skill commands (run in target extension, not this repo):
 - `./vendor/bin/rector process --dry-run` -- Rector PHP migrations

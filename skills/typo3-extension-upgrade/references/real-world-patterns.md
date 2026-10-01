@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Real-World Upgrade Patterns
 
 > **Source**: a production TYPO3 extension upgrade from v11 to v12/v13 (2024-12)

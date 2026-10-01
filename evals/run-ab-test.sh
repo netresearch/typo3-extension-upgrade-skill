@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # A/B test: WITHOUT skill vs WITH skill
 # Measures: output volume (chars), assertion pass rate, specificity
 set -euo pipefail
@@ -67,7 +69,6 @@ $SKILL_CONTEXT" \
     for j in $(seq 0 $((ASSERTION_COUNT - 1))); do
         ASSERT_TYPE=$(jq -r ".[$i].assertions[$j].type" "$EVALS_FILE")
         ASSERT_VALUE=$(jq -r ".[$i].assertions[$j].value" "$EVALS_FILE")
-        ASSERT_DESC=$(jq -r ".[$i].assertions[$j].description" "$EVALS_FILE")
 
         if [ "$ASSERT_TYPE" = "content_contains" ]; then
             if echo "$WITHOUT_OUTPUT" | grep -qiF "$ASSERT_VALUE"; then
