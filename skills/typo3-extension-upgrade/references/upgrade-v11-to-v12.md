@@ -69,11 +69,13 @@ $rectorConfig->sets([
 ### `redirect()` No Longer Ends the Action
 
 `redirect()`/`redirectToUri()` threw `StopActionException` up to v11 and return
-a `RedirectResponse` since v12. Every guard that calls one without `return`
-keeps running past its own refusal — in a permission check that is an
-authorization bypass. Grep and fix before the upgrade ships:
-`api-traps.md` → *A Discarded `redirect()` in a Guard Is an Authorization
-Bypass Since v12*.
+a `RedirectResponse` since v12. A guard that calls one without `return` keeps
+running past its own refusal; where the refusal was a security decision and
+the protected processing stays reachable, that is an authorization bypass
+(published twice: sf_event_mgt 2024, femanager 2026). A `return` in an
+`initialize…Action()` method does not help — the core ignores its result.
+Grep and fix before the upgrade ships: `api-traps.md` → *A `redirect()` That
+Is Not Returned No Longer Stops a Guard Since v12*.
 
 ### FormEngine DI Nodes Need Their Own `setData()`
 

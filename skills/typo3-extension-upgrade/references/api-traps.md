@@ -299,13 +299,13 @@ available." while `/package/` correctly answered 404.
 
 ---
 
-## A Discarded `redirect()` in a Guard Is an Authorization Bypass Since v12
+## A `redirect()` That Is Not Returned No Longer Stops a Guard Since v12
 
 Up to v11, `ActionController::redirect()` and `redirectToUri()` ended the
 action by throwing `StopActionException` (deprecated in 11.0, `@return never`).
-Since v12 they return a `RedirectResponse` and throw nothing. A permission
-check written the v11 way still compiles, still runs any flash message added
-before the call, and no longer stops anything:
+Since v12 they return a `RedirectResponse` and throw nothing. A check written
+the v11 way still compiles, still runs any flash message added before the call,
+and no longer stops anything:
 
 ```php
 // v11: redirect() threw, the save below never ran. v12+: it runs.
@@ -320,11 +320,57 @@ if (!$this->permissions->mayEdit($booking)) {
 }
 ```
 
-Wrapper helpers hide it twice: a helper that calls `$this->redirect()` without
-`return` discards the response itself, and one that does return it is still
-discarded by every caller that does not return the helper's result. Do not
-count on an automated migration having caught it — such a guard compiles,
-passes static analysis and can survive several major versions unnoticed.
+Not every discarded redirect is a vulnerability. It becomes an authorization
+bypass when the redirect *was* the security decision — an ownership,
+permission, token or state check — and the processing it was meant to prevent
+(a write, an export, a mail, a password change) is still reachable after it. A
+discarded redirect after the work is done is a functional bug at most.
+
+Two published advisories show the pattern, years apart:
+
+- **sf_event_mgt** — [TYPO3-EXT-SA-2024-001](https://news.typo3.com/security/advisory/typo3-ext-sa-2024-001)
+  (CVE-2024-24751, versions 7.0.0–7.3.3): "The existing access control check
+  for events in the backend module got broken during the update of the
+  extension to TYPO3 12.4, because the `RedirectResponse` from the
+  `$this->redirect()` function was never handled"
+  ([GHSA-4576-pgh2-g34j](https://github.com/derhansen/sf_event_mgt/security/advisories/GHSA-4576-pgh2-g34j)).
+  Backend users could export participant data and mail participants of events
+  they had no access to.
+- **femanager** — [TYPO3-EXT-SA-2026-024](https://news.typo3.com/security/advisory/typo3-ext-sa-2026-024)
+  (CVE-2026-77146, 8.x up to 8.4.1): the invitation controller "fails to stop
+  processing after redirecting on invalid input", which let an
+  unauthenticated attacker set a new password for and re-enable an arbitrary
+  frontend user account.
+  The fix in 8.4.2 adds `return` in front of four `$this->redirect('status')`
+  calls in `InvitationController` — the trap was still shipping in 2026, long
+  after the first v12 migration wave.
+
+### Adding `return` Is Not Always the Fix
+
+`return` ends the method it is written in, so the response has to travel up
+the whole call chain to the action:
+
+- **Helpers.** A helper that calls `$this->redirect()` without `return`
+  discards the response itself; one that returns it is still discarded by
+  every caller that does not return the helper's result.
+- **`initialize<Name>Action()`.** The core calls it in
+  `ActionController::processRequest()` before argument mapping and the action,
+  as `$callable();`, and ignores its result (v12.4 and v13.4). A
+  `return $this->redirect(...)` there ends only the initialization method; the
+  action runs afterwards. **`initializeAction()`** has the same problem in
+  v12.4, where it has no return type; since v13 it is declared `void`, so an
+  override that returns a response is a fatal error and fails closed. Move the
+  check into the action, or abort by throwing the response:
+  `throw new PropagateResponseException($this->redirect('list'), 1727740800);`
+  (the code is optional; by TYPO3 convention a Unix timestamp unique to the
+  call site). The `ResponsePropagation` middleware (frontend and backend) turns it into the
+  response. The class is marked `@internal`, but its docblock recommends it
+  for exactly this early "denied" case, and the core uses it in
+  `throwStatus()` (and, since v13, in `handleArgumentMappingExceptions()`).
+
+Do not count on an automated migration having caught it: such a guard
+compiles, can go unnoticed by static analysis, and can survive several major
+versions.
 
 `forward()` is not part of this trap: v12 removed it in favour of returning a
 `ForwardResponse`, so a leftover call is a fatal error and fails closed.
@@ -371,8 +417,10 @@ lock file named.
 
 ### Affected
 
-Every Extbase action migrated from v11 whose guard calls `redirect()`,
-`redirectToUri()` or a helper around them without `return`. Where the guarded
+Every Extbase action migrated from v11 whose security check calls
+`redirect()`, `redirectToUri()` or a helper around them without `return`, or
+returns one from `initialize<Name>Action()` (or from `initializeAction()` on
+v12). Where the guarded
 object comes from a form, the guard is the only protection: the
 `__trustedProperties` HMAC signs the `__identity` field's name but not the uid
 it holds — see the [security-audit skill](https://github.com/netresearch/security-audit-skill),
