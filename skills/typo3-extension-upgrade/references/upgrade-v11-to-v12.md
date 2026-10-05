@@ -77,6 +77,25 @@ the protected processing stays reachable, that is an authorization bypass
 Grep and fix before the upgrade ships: `api-traps.md` → *A `redirect()` That
 Is Not Returned No Longer Stops a Guard Since v12*.
 
+### `switchableControllerActions` Is No Longer Read
+
+> **Source**: [Breaking #96107 — Deprecated functionality removed](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-96107-DeprecatedFunctionalityRemoved.html)
+> ("Extbase switchable controller actions"), deprecated by #89463 in 10.3
+
+Since v12 Extbase evaluates no `switchableControllerActions`, neither from a
+plugin FlexForm nor from TypoScript: `cms-extbase/Classes` contains no reader
+for it. A FlexForm that still lists them is inert, and so are the values stored
+in `tt_content.pi_flexform` — the allowed actions come from
+`configurePlugin()` in `ext_localconf.php` alone. Two consequences:
+
+- A plugin that relied on the list to *restrict* actions now allows every
+  action `configurePlugin()` registers. Split it into one plugin per former
+  entry, as #89463 prescribes, or check the action in the controller.
+- An action can be removed by deleting it from `configurePlugin()`; the
+  FlexForm list and the stored content elements do not keep it alive and need
+  no database migration. Delete the dead list in the same change rather than
+  citing it as a reason to keep the action.
+
 ### FormEngine DI Nodes Need Their Own `setData()`
 
 > **Source**: [Deprecation #100670 — DI-aware FormEngine nodes](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.4/Deprecation-100670-DIAwareFormEngineNodes.html)
