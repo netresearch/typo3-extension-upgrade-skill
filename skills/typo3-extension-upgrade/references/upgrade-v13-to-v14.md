@@ -271,6 +271,20 @@ private $context = null;
 | Frontend HTTP compression removed | #107943 | check TypoScript `config.compressionLevel` | Delegate to web server (nginx/Apache) |
 | Extbase `ActionController->view` typed | #105377 | — | Type-check any custom controller overrides |
 
+### A docblock `@Validate` is silently dropped (#107229)
+
+The breaker table greps for `@Extbase\Annotation`. A docblock validator rarely matches that: the common forms are `@Validate(...)` (via `use TYPO3\CMS\Extbase\Annotation\Validate;`), `@Extbase\Validate(...)` (via `use TYPO3\CMS\Extbase\Annotation as Extbase;`), and the fully-qualified `@TYPO3\CMS\Extbase\Annotation\Validate(...)`. On v14 `ClassSchema` reads validators from the `#[Validate]` **attribute** only (via `getAttributes()`), so a docblock `@Validate` is not evaluated and raises no error. An access or opt-out validator written that way **fails open**: the action runs with the argument unvalidated.
+
+`@IgnoreValidation` is not a validator — it suppresses validation of one argument. Dropped on v14, the argument is validated normally again, so a value that used to be accepted may now be rejected. That is a fail-closed break, not a hole, but it needs the same conversion to the attribute.
+
+Grep for the annotation in all three forms, including a namespace prefix:
+
+```bash
+grep -rnE '@([A-Za-z0-9_]+\\)*(Validate|IgnoreValidation)\(' Classes/
+```
+
+For each hit, confirm the corresponding declaration also carries the `#[Validate]` / `#[IgnoreValidation]` attribute, and preserve the original target when converting — a property annotation maps to the property, a method-argument annotation to the parameter. If only the docblock is present, convert it (a sibling declaration usually already uses the attribute). Seen on cleverreach: `optoutSubmitAction()` kept a docblock `@Validate`, so on v14 its opt-out validator never ran while the sibling `optinSubmitAction()` (attribute) was fine.
+
 ### A CType migration orphans TypoScript references, silently
 
 `ExtensionUtility::configurePlugin()` with `PLUGIN_TYPE_CONTENT_ELEMENT`
