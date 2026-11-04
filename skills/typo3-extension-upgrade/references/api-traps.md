@@ -391,12 +391,17 @@ writing the fix, especially in someone else's extension:
   unauthorised write. Do not ship that. Park the fix until the owner decides,
   or remove the action from the plugin registration when no released version
   ever ran it.
-- **Check the released history.** Whether a released version that allowed
-  TYPO3 11 or older registered the action decides whether the gap already
-  shipped. If it did, it is a security matter for the vendor's or the TYPO3
+- **Check the released history.** The gap already shipped if any released
+  version registered the action and let a request reach the write without the
+  access check: typically one that still allowed TYPO3 11 or older, where the
+  failure that keeps the action closed today did not occur yet, but equally a
+  v12+ release without that failure. If one did, it is a security matter for
+  the vendor's or the TYPO3
   Security Team's private channel, not a public pull request or issue.
-- **Dead code gets an issue, not a fix.** When the action is not registered
-  in any plugin, or the extension does not load on v12 at all, a patch fixes
+- **Dead code gets an issue, not a fix.** When the action is registered
+  neither in a plugin nor in a backend module's `controllerActions`
+  (`Configuration/Backend/Modules.php`), or the extension loads on no TYPO3
+  version from 12 on, a patch fixes
   nothing a user can reach; report it as an issue and let the maintainer
   decide.
 
