@@ -378,6 +378,33 @@ versions.
 `?ResponseInterface` in v11, so a discarded call to it is an older bug of the
 same shape rather than a v12 regression; the greps below find it too.
 
+### Before Fixing: What Would the Fix Unlock?
+
+A discarded redirect is not always the only defect in the action. Sometimes
+the action currently fails closed for another reason (a later type error, a
+missing argument, a 500), and adding `return` is what makes it work. Before
+writing the fix, especially in someone else's extension:
+
+- **Read the action's own access check.** If nothing but the broken path stops
+  an unauthenticated or non-owner request from reaching a write, then a fix
+  that only adds `return` turns a crashing action into a working
+  unauthorised write. Do not ship that. Park the fix until the owner decides,
+  or remove the action from the plugin registration when no released version
+  ever ran it.
+- **Check the released history.** The gap already shipped if any released
+  version registered the action and let a request reach the write without the
+  access check: typically one that still allowed TYPO3 11 or older, where the
+  failure that keeps the action closed today did not occur yet, but equally a
+  v12+ release without that failure. If one did, it is a security matter for
+  the vendor's or the TYPO3
+  Security Team's private channel, not a public pull request or issue.
+- **Dead code gets an issue, not a fix.** When the action is registered
+  neither in a plugin nor in a backend module's `controllerActions`
+  (`Configuration/Backend/Modules.php`), or the extension loads on no TYPO3
+  version from 12 on, a patch fixes
+  nothing a user can reach; report it as an issue and let the maintainer
+  decide.
+
 ### Search Pattern
 
 ```bash

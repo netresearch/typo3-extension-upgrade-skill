@@ -457,6 +457,16 @@ parameters:
 
 v14 rewired `withQueryArguments()` to use the new `UrlFactory.createSearchParams()` instead of v12/v13's `InputTransformer.toSearchParams()`, silently dropping a `decodeURI()` step that used to neutralize one layer of manual pre-encoding. Any extension JS calling `.withQueryArguments({ key: encodeURIComponent(value) })` — a common pattern for a FAL combined identifier (`storage:/path`) — breaks on v14 (double-encoded value, server-side resolution fails) while the identical code stays correct on v12/v13. Not listed in `Documentation/Changelog/14.0/` as a Breaking change. Full writeup with the fix and verification method: `api-traps.md`.
 
+### `MultiStepWizard` can render its first slide empty on v14 — a race in the core
+
+With the native-`<dialog>` modal (#107443), `ModalElement.firstUpdated()` is `this.showModal(), this.callback && this.callback(this)`. `showModal()` is `async` and first awaits a `requestAnimationFrame`; only after that does it fire `typo3-modal-show`, and only that event's listener sets `Modal.currentModal`. The callback therefore runs one frame earlier. `MultiStepWizard.initializeEvents()` ends with `Modal.currentModal.addEventListener('typo3-modal-hidden', …)`, reading a property the core has not set yet. Whether it throws depends on a race (the module imports in the callback against the frame). Read at v14.3.10 (`modal.js`, `multi-step-wizard.js`); on v13.4 the modal is still the Bootstrap one and does not take this path.
+
+The symptom is not the console error but what the throw skips: the rest of the callback, including `lockNextStep()` / `lockPrevStep()` and `runSlideCallback()` for slide 0. A wizard whose first slide is built in its slide callback opens with that step empty, which reads as "the form does not render", not as a JS error.
+
+Workaround in extension code: right after `MultiStepWizard.show()`, set `Modal.currentModal` yourself when it is not set: it is `null` before the first modal and `undefined` after the last open modal was closed (the `typo3-modal-hide` handler assigns `this.instances[s-1]`), so test for both. `generate()` has already attached the element to the DOM synchronously, and `typo3-modal-show` later overwrites the property with the same element. Query `document`, not `top.document`: `modal.js` attaches to the document of its own realm, and an eagerly evaluated `top.document` throws mid-open on a foreign origin.
+
+Do not claim a regression test for it: the race could not be forced in CI (opening twice, pre-importing the module — both green on the same 14.3.6). A test that says it guards this is a green no-op. The real fix belongs in the core: `initializeEvents()` already holds the modal element in its first line (`$carousel.closest('.modal')`) and need not read the singleton.
+
 ---
 
 ## Dual-version compatibility guards
