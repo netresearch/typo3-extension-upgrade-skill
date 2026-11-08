@@ -467,6 +467,8 @@ Workaround in extension code: right after `MultiStepWizard.show()`, set `Modal.c
 
 Do not claim a regression test for it: the race could not be forced in CI (opening twice, pre-importing the module — both green on the same 14.3.6). A test that says it guards this is a green no-op. The real fix belongs in the core: `initializeEvents()` already holds the modal element in its first line (`$carousel.closest('.modal')`) and need not read the singleton.
 
+Core status: still unfixed on the `14.3` branch as of `f6393f9294` (2026-11-07): `modal.ts` sets `Modal.currentModal` only in the `typo3-modal-show` listener, and `multi-step-wizard.ts` line 321 still reads it. On `main` (v15), `62ebef805b` (`[!!!][TASK] Remove jQuery`, #109998) removed `@typo3/backend/multi-step-wizard.js` without a deprecation phase, so a core fix can only target 14.3. An extension using `MultiStepWizard` needs a replacement before v15; `Breaking-109998-RemovedJQuery.rst` offers none and says to bring an own wizard or copy the removed module together with a bundled jQuery.
+
 ---
 
 ## Dual-version compatibility guards
