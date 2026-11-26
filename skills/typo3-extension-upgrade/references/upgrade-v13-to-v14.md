@@ -317,8 +317,8 @@ So `typo3/cms-install: ^13.4 || ^14.3` belongs in `require`, not
 `require-dev`: Composer does not install a dependency's `require-dev`, and
 on a 13.4 site without the package the wizard's parent class does not exist
 while the service scan of `Classes/` still finds the wizard, so the class
-cannot load and the migration cannot run. A 14-only
-extension extends the `Core` class and needs no `cms-install`. Seen on
+cannot load and the migration cannot run. A 14-only extension extends the
+`Core` class and needs no `cms-install`. Seen on
 [netresearch/t3x-nr-saml-auth#135](https://github.com/netresearch/t3x-nr-saml-auth/pull/135),
 where CodeRabbit found it after the push.
 
