@@ -304,6 +304,29 @@ sitepackage or a sibling extension, not next to the registration. On
 extensions.typo3.org a page type did this for five months, from the CType
 migration on 2026-04-01 until someone read the response on 2026-09-14.
 
+### The `list_type` → `CType` wizard needs `typo3/cms-install` in `require` on 13.4
+
+An extension for `^13.4 || ^14.3` migrates existing plugin records with a
+wizard that extends `AbstractListTypeToCTypeUpdate` and carries
+`#[UpgradeWizard]`. On 13.4 both exist only in `typo3/cms-install`
+(`TYPO3\CMS\Install\Updates\…`, `TYPO3\CMS\Install\Attribute\…`). On 14.3
+the class is `TYPO3\CMS\Core\Upgrades\AbstractListTypeToCTypeUpdate`, and
+the `Install` names are deprecated aliases in `cms-core`, removed in v15.
+
+So `typo3/cms-install: ^13.4 || ^14.3` belongs in `require`, not
+`require-dev`: Composer does not install a dependency's `require-dev`, and
+on a 13.4 site without the package the wizard's parent class does not exist
+while the service scan of `Classes/` still finds the wizard, so the class
+cannot load and the migration cannot run. A 14-only extension extends the
+`Core` class and needs no `cms-install`. Seen on
+[netresearch/t3x-nr-saml-auth#135](https://github.com/netresearch/t3x-nr-saml-auth/pull/135),
+where CodeRabbit found it after the push.
+
+When the previous extension line supports 12.4 + 13.4 and the new one
+13.4 + 14.3, a 12.4 site cannot take the new release in one step. The
+migration guide orders it: TYPO3 12.4 → 13.4 with the old extension, then
+the new extension and its wizard, then TYPO3 14.3.
+
 ### v14.x deprecations (still callable, removed in v15.0)
 
 These are **not** v14.0 breakers — code keeps working — but you should migrate to silence deprecation notices and prepare for v15.
